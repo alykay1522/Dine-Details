@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Clock, Instagram, Facebook, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import msPiggyImg from "@assets/msPiggy_1776657247419.jpg";
 
 export default function Contact() {
   const { toast } = useToast();
@@ -31,12 +32,32 @@ export default function Contact() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
-          <h1 className="font-serif text-5xl md:text-6xl text-foreground mb-6">Contact Us</h1>
-          <div className="h-px w-24 bg-primary mx-auto mb-6"></div>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto italic">
-            We'd love to hear from you. Stop in, call, or send us a message.
+          {/* Ms. Piggy mascot */}
+          <div className="flex flex-col items-center gap-6 mb-8">
+            <div className="relative inline-block">
+              <img
+                src={msPiggyImg}
+                alt="This Little Piggy mascot"
+                className="w-40 h-40 rounded-full object-cover border-4 border-primary shadow-2xl shadow-primary/40"
+              />
+              {/* Sparkle ring */}
+              <div className="absolute inset-0 rounded-full border-4 border-accent/40 scale-110 animate-pulse" />
+            </div>
+            {/* Speech bubble */}
+            <div className="relative bg-card border-2 border-primary/40 rounded-2xl px-6 py-3 shadow-lg max-w-xs">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-card border-l-2 border-t-2 border-primary/40 rotate-45" />
+              <p className="font-serif text-primary font-bold text-base">"We'd love to hear from ya!"</p>
+            </div>
+          </div>
+
+          <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
+            <span className="text-primary">Get In</span> <span className="text-accent">Touch</span>
+          </h1>
+          <div className="h-1 w-24 bg-primary mx-auto mb-4 rounded-full"></div>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Stop in, call, or send us a message. We're happy to help!
           </p>
         </motion.div>
 
