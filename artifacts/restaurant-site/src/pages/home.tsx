@@ -6,6 +6,8 @@ import { ArrowRight, MapPin, Clock, Phone } from "lucide-react";
 import heroImg from "@/assets/images/hero.png";
 import msPiggyImg from "@assets/msPiggy_1776656228023.jpg";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
+import truckFrontImg from "@assets/foodtruckfront_1776656329344.jpg";
+import truckBackImg from "@assets/Foodtruck_1776656329342.jpg";
 
 export default function Home() {
   const { data: specials, isLoading } = useGetCurrentSpecials();
@@ -88,15 +90,32 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="relative aspect-square max-w-md mx-auto">
-                <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl" />
-                <img
-                  src={msPiggyImg}
-                  alt="Ms. Piggy mascot"
-                  className="relative z-10 w-full h-full object-cover rounded-3xl border-4 border-primary shadow-2xl shadow-primary/30"
-                />
+              {/* Food truck photos stacked with offset */}
+              <div className="relative max-w-lg mx-auto">
+                {/* Back photo — slightly offset behind */}
+                <div className="absolute top-4 left-4 right-0 rounded-2xl overflow-hidden border-4 border-primary/40 shadow-xl shadow-black/60 z-0">
+                  <img
+                    src={truckBackImg}
+                    alt="This Little Piggy food truck — back view"
+                    className="w-full h-56 object-cover"
+                  />
+                </div>
+                {/* Front photo — on top */}
+                <div className="relative z-10 mt-0 rounded-2xl overflow-hidden border-4 border-primary shadow-2xl shadow-primary/30 ml-0 mr-4 mb-4">
+                  <img
+                    src={truckFrontImg}
+                    alt="This Little Piggy food truck"
+                    className="w-full object-cover"
+                    style={{ aspectRatio: "16/10" }}
+                  />
+                  {/* Overlay badge */}
+                  <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm border border-primary/50 rounded-xl px-4 py-2 flex items-center gap-2">
+                    <img src={msPiggyImg} alt="" className="w-8 h-8 rounded-full object-cover border border-primary" />
+                    <span className="font-serif font-bold text-primary text-sm">Where it all started!</span>
+                  </div>
+                </div>
                 {/* Decorative badge */}
-                <div className="absolute -bottom-4 -right-4 bg-accent text-accent-foreground font-serif font-bold text-sm px-4 py-2 rounded-full shadow-lg z-20 border-2 border-background">
+                <div className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground font-serif font-bold text-sm px-4 py-2 rounded-full shadow-lg z-20 border-2 border-background">
                   Est. Canyon, TX
                 </div>
               </div>
