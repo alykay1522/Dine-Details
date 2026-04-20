@@ -5,18 +5,28 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  CreateGalleryPhotoBody,
+  CreateSpecialBody,
+  GalleryPhoto,
+  HealthStatus,
+  Special,
+  UpdateSpecialBody,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -99,3 +109,744 @@ export function useHealthCheck<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Returns all current specials ordered by date descending
+ * @summary List all specials
+ */
+export const getListSpecialsUrl = () => {
+  return `/api/specials`;
+};
+
+export const listSpecials = async (
+  options?: RequestInit,
+): Promise<Special[]> => {
+  return customFetch<Special[]>(getListSpecialsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListSpecialsQueryKey = () => {
+  return [`/api/specials`] as const;
+};
+
+export const getListSpecialsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSpecials>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSpecials>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListSpecialsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listSpecials>>> = ({
+    signal,
+  }) => listSpecials({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSpecials>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListSpecialsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSpecials>>
+>;
+export type ListSpecialsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all specials
+ */
+
+export function useListSpecials<
+  TData = Awaited<ReturnType<typeof listSpecials>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listSpecials>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListSpecialsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a special
+ */
+export const getCreateSpecialUrl = () => {
+  return `/api/specials`;
+};
+
+export const createSpecial = async (
+  createSpecialBody: CreateSpecialBody,
+  options?: RequestInit,
+): Promise<Special> => {
+  return customFetch<Special>(getCreateSpecialUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createSpecialBody),
+  });
+};
+
+export const getCreateSpecialMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSpecial>>,
+    TError,
+    { data: BodyType<CreateSpecialBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSpecial>>,
+  TError,
+  { data: BodyType<CreateSpecialBody> },
+  TContext
+> => {
+  const mutationKey = ["createSpecial"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSpecial>>,
+    { data: BodyType<CreateSpecialBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSpecial(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSpecialMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSpecial>>
+>;
+export type CreateSpecialMutationBody = BodyType<CreateSpecialBody>;
+export type CreateSpecialMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a special
+ */
+export const useCreateSpecial = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSpecial>>,
+    TError,
+    { data: BodyType<CreateSpecialBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createSpecial>>,
+  TError,
+  { data: BodyType<CreateSpecialBody> },
+  TContext
+> => {
+  return useMutation(getCreateSpecialMutationOptions(options));
+};
+
+/**
+ * Returns today's featured specials for the home page preview
+ * @summary Get today's active specials
+ */
+export const getGetCurrentSpecialsUrl = () => {
+  return `/api/specials/current`;
+};
+
+export const getCurrentSpecials = async (
+  options?: RequestInit,
+): Promise<Special[]> => {
+  return customFetch<Special[]>(getGetCurrentSpecialsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCurrentSpecialsQueryKey = () => {
+  return [`/api/specials/current`] as const;
+};
+
+export const getGetCurrentSpecialsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentSpecials>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentSpecials>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentSpecialsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentSpecials>>
+  > = ({ signal }) => getCurrentSpecials({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentSpecials>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCurrentSpecialsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentSpecials>>
+>;
+export type GetCurrentSpecialsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get today's active specials
+ */
+
+export function useGetCurrentSpecials<
+  TData = Awaited<ReturnType<typeof getCurrentSpecials>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentSpecials>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCurrentSpecialsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get a single special
+ */
+export const getGetSpecialUrl = (id: number) => {
+  return `/api/specials/${id}`;
+};
+
+export const getSpecial = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Special> => {
+  return customFetch<Special>(getGetSpecialUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSpecialQueryKey = (id: number) => {
+  return [`/api/specials/${id}`] as const;
+};
+
+export const getGetSpecialQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSpecial>>,
+  TError = ErrorType<void>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSpecial>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSpecialQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSpecial>>> = ({
+    signal,
+  }) => getSpecial(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSpecial>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSpecialQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSpecial>>
+>;
+export type GetSpecialQueryError = ErrorType<void>;
+
+/**
+ * @summary Get a single special
+ */
+
+export function useGetSpecial<
+  TData = Awaited<ReturnType<typeof getSpecial>>,
+  TError = ErrorType<void>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getSpecial>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSpecialQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Update a special
+ */
+export const getUpdateSpecialUrl = (id: number) => {
+  return `/api/specials/${id}`;
+};
+
+export const updateSpecial = async (
+  id: number,
+  updateSpecialBody: UpdateSpecialBody,
+  options?: RequestInit,
+): Promise<Special> => {
+  return customFetch<Special>(getUpdateSpecialUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateSpecialBody),
+  });
+};
+
+export const getUpdateSpecialMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSpecial>>,
+    TError,
+    { id: number; data: BodyType<UpdateSpecialBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSpecial>>,
+  TError,
+  { id: number; data: BodyType<UpdateSpecialBody> },
+  TContext
+> => {
+  const mutationKey = ["updateSpecial"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSpecial>>,
+    { id: number; data: BodyType<UpdateSpecialBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateSpecial(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSpecialMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSpecial>>
+>;
+export type UpdateSpecialMutationBody = BodyType<UpdateSpecialBody>;
+export type UpdateSpecialMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a special
+ */
+export const useUpdateSpecial = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSpecial>>,
+    TError,
+    { id: number; data: BodyType<UpdateSpecialBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateSpecial>>,
+  TError,
+  { id: number; data: BodyType<UpdateSpecialBody> },
+  TContext
+> => {
+  return useMutation(getUpdateSpecialMutationOptions(options));
+};
+
+/**
+ * @summary Delete a special
+ */
+export const getDeleteSpecialUrl = (id: number) => {
+  return `/api/specials/${id}`;
+};
+
+export const deleteSpecial = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteSpecialUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteSpecialMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSpecial>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteSpecial>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteSpecial"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteSpecial>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteSpecial(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteSpecialMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteSpecial>>
+>;
+
+export type DeleteSpecialMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a special
+ */
+export const useDeleteSpecial = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteSpecial>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteSpecial>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteSpecialMutationOptions(options));
+};
+
+/**
+ * @summary List gallery photos
+ */
+export const getListGalleryUrl = () => {
+  return `/api/gallery`;
+};
+
+export const listGallery = async (
+  options?: RequestInit,
+): Promise<GalleryPhoto[]> => {
+  return customFetch<GalleryPhoto[]>(getListGalleryUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListGalleryQueryKey = () => {
+  return [`/api/gallery`] as const;
+};
+
+export const getListGalleryQueryOptions = <
+  TData = Awaited<ReturnType<typeof listGallery>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listGallery>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListGalleryQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listGallery>>> = ({
+    signal,
+  }) => listGallery({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listGallery>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListGalleryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listGallery>>
+>;
+export type ListGalleryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List gallery photos
+ */
+
+export function useListGallery<
+  TData = Awaited<ReturnType<typeof listGallery>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listGallery>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListGalleryQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Add a gallery photo
+ */
+export const getCreateGalleryPhotoUrl = () => {
+  return `/api/gallery`;
+};
+
+export const createGalleryPhoto = async (
+  createGalleryPhotoBody: CreateGalleryPhotoBody,
+  options?: RequestInit,
+): Promise<GalleryPhoto> => {
+  return customFetch<GalleryPhoto>(getCreateGalleryPhotoUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createGalleryPhotoBody),
+  });
+};
+
+export const getCreateGalleryPhotoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGalleryPhoto>>,
+    TError,
+    { data: BodyType<CreateGalleryPhotoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createGalleryPhoto>>,
+  TError,
+  { data: BodyType<CreateGalleryPhotoBody> },
+  TContext
+> => {
+  const mutationKey = ["createGalleryPhoto"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createGalleryPhoto>>,
+    { data: BodyType<CreateGalleryPhotoBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createGalleryPhoto(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateGalleryPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGalleryPhoto>>
+>;
+export type CreateGalleryPhotoMutationBody = BodyType<CreateGalleryPhotoBody>;
+export type CreateGalleryPhotoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Add a gallery photo
+ */
+export const useCreateGalleryPhoto = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createGalleryPhoto>>,
+    TError,
+    { data: BodyType<CreateGalleryPhotoBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createGalleryPhoto>>,
+  TError,
+  { data: BodyType<CreateGalleryPhotoBody> },
+  TContext
+> => {
+  return useMutation(getCreateGalleryPhotoMutationOptions(options));
+};
+
+/**
+ * @summary Delete a gallery photo
+ */
+export const getDeleteGalleryPhotoUrl = (id: number) => {
+  return `/api/gallery/${id}`;
+};
+
+export const deleteGalleryPhoto = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteGalleryPhotoUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteGalleryPhotoMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGalleryPhoto>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteGalleryPhoto>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteGalleryPhoto"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteGalleryPhoto>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteGalleryPhoto(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteGalleryPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteGalleryPhoto>>
+>;
+
+export type DeleteGalleryPhotoMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a gallery photo
+ */
+export const useDeleteGalleryPhoto = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteGalleryPhoto>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteGalleryPhoto>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteGalleryPhotoMutationOptions(options));
+};

@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: specials
+    description: Daily and weekly specials
+  - name: gallery
+    description: Photo gallery
 paths:
   /healthz:
     get:
@@ -24,6 +28,160 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /specials:
+    get:
+      operationId: listSpecials
+      tags: [specials]
+      summary: List all specials
+      description: Returns all current specials ordered by date descending
+      responses:
+        "200":
+          description: List of specials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Special"
+    post:
+      operationId: createSpecial
+      tags: [specials]
+      summary: Create a special
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSpecialBody"
+      responses:
+        "201":
+          description: Created special
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Special"
+
+  /specials/current:
+    get:
+      operationId: getCurrentSpecials
+      tags: [specials]
+      summary: Get today's active specials
+      description: Returns today's featured specials for the home page preview
+      responses:
+        "200":
+          description: Current specials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Special"
+
+  /specials/{id}:
+    get:
+      operationId: getSpecial
+      tags: [specials]
+      summary: Get a single special
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Special found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Special"
+        "404":
+          description: Not found
+    put:
+      operationId: updateSpecial
+      tags: [specials]
+      summary: Update a special
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSpecialBody"
+      responses:
+        "200":
+          description: Updated special
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Special"
+    delete:
+      operationId: deleteSpecial
+      tags: [specials]
+      summary: Delete a special
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /gallery:
+    get:
+      operationId: listGallery
+      tags: [gallery]
+      summary: List gallery photos
+      responses:
+        "200":
+          description: Gallery photos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryPhoto"
+    post:
+      operationId: createGalleryPhoto
+      tags: [gallery]
+      summary: Add a gallery photo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGalleryPhotoBody"
+      responses:
+        "201":
+          description: Created photo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryPhoto"
+
+  /gallery/{id}:
+    delete:
+      operationId: deleteGalleryPhoto
+      tags: [gallery]
+      summary: Delete a gallery photo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +192,125 @@ components:
       required:
         - status
 
+    Special:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        category:
+          type: string
+          description: "daily or weekly"
+        isActive:
+          type: boolean
+        featuredDate:
+          type: string
+          description: ISO date string (YYYY-MM-DD)
+        createdAt:
+          type: string
+          description: ISO datetime string
+      required:
+        - id
+        - title
+        - description
+        - category
+        - isActive
+        - featuredDate
+        - createdAt
+
+    CreateSpecialBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        category:
+          type: string
+          description: "daily or weekly"
+        isActive:
+          type: boolean
+        featuredDate:
+          type: string
+          description: ISO date string (YYYY-MM-DD)
+      required:
+        - title
+        - description
+        - category
+        - isActive
+        - featuredDate
+
+    UpdateSpecialBody:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        category:
+          type: string
+        isActive:
+          type: boolean
+        featuredDate:
+          type: string
+
+    GalleryPhoto:
+      type: object
+      properties:
+        id:
+          type: integer
+        imageUrl:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - imageUrl
+        - sortOrder
+        - createdAt
+
+    CreateGalleryPhotoBody:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+      required:
+        - imageUrl
+        - sortOrder

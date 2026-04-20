@@ -14,3 +14,137 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Returns all current specials ordered by date descending
+ * @summary List all specials
+ */
+export const ListSpecialsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().describe("daily or weekly"),
+  isActive: zod.boolean(),
+  featuredDate: zod.string().describe("ISO date string (YYYY-MM-DD)"),
+  createdAt: zod.string().describe("ISO datetime string"),
+});
+export const ListSpecialsResponse = zod.array(ListSpecialsResponseItem);
+
+/**
+ * @summary Create a special
+ */
+export const CreateSpecialBody = zod.object({
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().describe("daily or weekly"),
+  isActive: zod.boolean(),
+  featuredDate: zod.string().describe("ISO date string (YYYY-MM-DD)"),
+});
+
+/**
+ * Returns today's featured specials for the home page preview
+ * @summary Get today's active specials
+ */
+export const GetCurrentSpecialsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().describe("daily or weekly"),
+  isActive: zod.boolean(),
+  featuredDate: zod.string().describe("ISO date string (YYYY-MM-DD)"),
+  createdAt: zod.string().describe("ISO datetime string"),
+});
+export const GetCurrentSpecialsResponse = zod.array(
+  GetCurrentSpecialsResponseItem,
+);
+
+/**
+ * @summary Get a single special
+ */
+export const GetSpecialParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetSpecialResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().describe("daily or weekly"),
+  isActive: zod.boolean(),
+  featuredDate: zod.string().describe("ISO date string (YYYY-MM-DD)"),
+  createdAt: zod.string().describe("ISO datetime string"),
+});
+
+/**
+ * @summary Update a special
+ */
+export const UpdateSpecialParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateSpecialBody = zod.object({
+  title: zod.string().optional(),
+  description: zod.string().optional(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().optional(),
+  isActive: zod.boolean().optional(),
+  featuredDate: zod.string().optional(),
+});
+
+export const UpdateSpecialResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  price: zod.string().nullish(),
+  imageUrl: zod.string().nullish(),
+  category: zod.string().describe("daily or weekly"),
+  isActive: zod.boolean(),
+  featuredDate: zod.string().describe("ISO date string (YYYY-MM-DD)"),
+  createdAt: zod.string().describe("ISO datetime string"),
+});
+
+/**
+ * @summary Delete a special
+ */
+export const DeleteSpecialParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List gallery photos
+ */
+export const ListGalleryResponseItem = zod.object({
+  id: zod.number(),
+  imageUrl: zod.string(),
+  caption: zod.string().nullish(),
+  category: zod.string().nullish(),
+  sortOrder: zod.number(),
+  createdAt: zod.string(),
+});
+export const ListGalleryResponse = zod.array(ListGalleryResponseItem);
+
+/**
+ * @summary Add a gallery photo
+ */
+export const CreateGalleryPhotoBody = zod.object({
+  imageUrl: zod.string(),
+  caption: zod.string().nullish(),
+  category: zod.string().nullish(),
+  sortOrder: zod.number(),
+});
+
+/**
+ * @summary Delete a gallery photo
+ */
+export const DeleteGalleryPhotoParams = zod.object({
+  id: zod.coerce.number(),
+});

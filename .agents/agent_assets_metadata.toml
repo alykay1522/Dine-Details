@@ -1,0 +1,50 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Iqo4dp_v8Ii2nGWwZl0lj"
+uri = "file://artifacts/restaurant-site/src/assets/images/hero.png"
+type = "image"
+title = "Farm to table hero spread"
+
+[[generated]]
+id = "e0FpV73CdUf_1WVAu5ij3"
+uri = "file://artifacts/restaurant-site/src/assets/images/starter.png"
+type = "image"
+title = "Burrata starter dish"
+
+[[generated]]
+id = "gY2bBexpcrRzW1X0eJAKT"
+uri = "file://artifacts/restaurant-site/src/assets/images/main1.png"
+type = "image"
+title = "Roasted chicken main dish"
+
+[[generated]]
+id = "PWSKUogxwKmKW2hEUCW12"
+uri = "file://artifacts/restaurant-site/src/assets/images/main2.png"
+type = "image"
+title = "Handmade pasta main dish"
+
+[[generated]]
+id = "GbLZZCPW6qTwg9r1j_qgk"
+uri = "file://artifacts/restaurant-site/src/assets/images/dessert.png"
+type = "image"
+title = "Rustic fruit tart dessert"
+
+[[generated]]
+id = "L99-JumTEIBe1BqgIzKCC"
+uri = "file://artifacts/restaurant-site/src/assets/images/drink.png"
+type = "image"
+title = "Craft cocktail drink"
+
+[[generated]]
+id = "6oMC6G5Bsgrl4d3K8PHVj"
+uri = "file://artifacts/restaurant-site/src/assets/images/interior1.png"
+type = "image"
+title = "Warm restaurant interior"
+
+[[generated]]
+id = "9dreWGEDgWBBxoV6OHHum"
+uri = "file://artifacts/restaurant-site/src/assets/images/interior2.png"
+type = "image"
+title = "Restaurant exterior details"

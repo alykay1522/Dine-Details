@@ -6,4 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./createGalleryPhotoBody";
+export * from "./createSpecialBody";
+export * from "./galleryPhoto";
 export * from "./healthStatus";
+export * from "./special";
+export * from "./updateSpecialBody";

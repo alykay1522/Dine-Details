@@ -8,3 +8,56 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface Special {
+  id: number;
+  title: string;
+  description: string;
+  price?: string | null;
+  imageUrl?: string | null;
+  /** daily or weekly */
+  category: string;
+  isActive: boolean;
+  /** ISO date string (YYYY-MM-DD) */
+  featuredDate: string;
+  /** ISO datetime string */
+  createdAt: string;
+}
+
+export interface CreateSpecialBody {
+  title: string;
+  description: string;
+  price?: string | null;
+  imageUrl?: string | null;
+  /** daily or weekly */
+  category: string;
+  isActive: boolean;
+  /** ISO date string (YYYY-MM-DD) */
+  featuredDate: string;
+}
+
+export interface UpdateSpecialBody {
+  title?: string;
+  description?: string;
+  price?: string | null;
+  imageUrl?: string | null;
+  category?: string;
+  isActive?: boolean;
+  featuredDate?: string;
+}
+
+export interface GalleryPhoto {
+  id: number;
+  imageUrl: string;
+  caption?: string | null;
+  category?: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface CreateGalleryPhotoBody {
+  imageUrl: string;
+  caption?: string | null;
+  category?: string | null;
+  sortOrder: number;
+}
