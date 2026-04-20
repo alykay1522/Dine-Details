@@ -17,6 +17,22 @@ import img12 from "@assets/1000017248_1776656424761.jpg";
 import truckFront from "@assets/foodtruckfront_1776656329344.jpg";
 import truckBack from "@assets/Foodtruck_1776656329342.jpg";
 import msPiggy from "@assets/msPiggy_1776656228023.jpg";
+import img16 from "@assets/1000017249_1776657659125.jpg";
+import img17 from "@assets/1000017250_1776657659128.jpg";
+import img18 from "@assets/1000017251_1776657659129.jpg";
+import img19 from "@assets/1000017252_1776657659130.jpg";
+import img20 from "@assets/1000017253_1776657659132.jpg";
+import img21 from "@assets/1000017254_1776657659134.jpg";
+import img22 from "@assets/1000017255_1776657659135.jpg";
+import img23 from "@assets/1000017256_1776657659136.jpg";
+import img24 from "@assets/1000017257_1776657659137.jpg";
+import img25 from "@assets/1000017258_1776657659139.jpg";
+import img26 from "@assets/1000017259_1776657659140.jpg";
+import img27 from "@assets/1000017260_1776657659141.jpg";
+import img28 from "@assets/1000017261_1776657659143.jpg";
+import img29 from "@assets/1000017262_1776657659145.jpg";
+import img30 from "@assets/1000017263_1776657659146.jpg";
+import img31 from "@assets/1000017264_1776657659147.jpg";
 
 const GALLERY = [
   { id: 1, src: img1, caption: "Fresh from the kitchen" },
@@ -34,6 +50,22 @@ const GALLERY = [
   { id: 13, src: truckFront, caption: "The original food truck" },
   { id: 14, src: truckBack, caption: "Honk if you like my butt!" },
   { id: 15, src: msPiggy, caption: "The face of This Little Piggy" },
+  { id: 16, src: img16, caption: "Golden fried catfish" },
+  { id: 17, src: img17, caption: "Pasta with marinara & olive tapenade" },
+  { id: 18, src: img18, caption: "Loaded burger & fries" },
+  { id: 19, src: img19, caption: "Open-face roasted chicken & mashed potatoes" },
+  { id: 20, src: img20, caption: "Creamy homestyle chowder" },
+  { id: 21, src: img21, caption: "Club sandwiches with chips & fried okra" },
+  { id: 22, src: img22, caption: "The Piggy Pizza — jalapeños & all" },
+  { id: 23, src: img23, caption: "Frito pie loaded up right" },
+  { id: 24, src: img24, caption: "House salad piled high" },
+  { id: 25, src: img25, caption: "Hearty minestrone soup" },
+  { id: 26, src: img26, caption: "Marinated olive & mushroom salad" },
+  { id: 27, src: img27, caption: "Smothered potato & cherry cobbler" },
+  { id: 28, src: img28, caption: "Chicken marsala with fettuccine" },
+  { id: 29, src: img29, caption: "Fried veggie basket" },
+  { id: 30, src: img30, caption: "Taco pizza" },
+  { id: 31, src: img31, caption: "Supreme pizza fresh out of the oven" },
 ];
 
 export default function Gallery() {
