@@ -49,8 +49,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="h-14 w-14 rounded-full object-cover border-2 border-primary shadow-md shadow-primary/30 transition-transform group-hover:scale-105"
             />
             <div className="flex flex-col leading-tight hidden sm:flex">
-              <span className="font-serif text-lg font-bold text-primary leading-none">This Little Piggy</span>
-              <span className="font-serif text-sm text-accent font-semibold leading-none tracking-wide">Serves Food</span>
+              <span className="font-serif text-lg font-bold text-primary leading-none">This Little Piggy Serves Food LLC</span>
             </div>
           </Link>
 
@@ -123,7 +122,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col items-center mb-12">
             <img src={logoImg} alt="This Little Piggy Serves Food" className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow-lg shadow-primary/30 mb-4" />
-            <span className="font-serif text-2xl font-bold text-primary">This Little Piggy Serves Food</span>
+            <span className="font-serif text-2xl font-bold text-primary">This Little Piggy Serves Food LLC</span>
             <p className="text-muted-foreground text-sm mt-2 max-w-xs text-center">
               Family-owned by Tim and Rene Vogler. Serving Canyon, TX and surrounding areas with big flavors and even bigger butts!
             </p>
