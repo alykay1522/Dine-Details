@@ -169,7 +169,7 @@ export default function Menu() {
             19501 Chaparral Rd, Canyon, TX 79015
           </p>
           <p className="text-muted-foreground mt-1 font-semibold">
-            (806) 340-3895 &nbsp;|&nbsp; (806) 499-3307
+            (806) 340-3895
           </p>
         </motion.div>
 
@@ -183,18 +183,11 @@ export default function Menu() {
           <p className="font-serif text-lg font-bold text-foreground text-center sm:text-left">
             Ready to order? Give us a call!
           </p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a href="tel:+18063403895">
-              <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
-                <Phone size={16} /> (806) 340-3895
-              </button>
-            </a>
-            <a href="tel:+18064993307">
-              <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
-                <Phone size={16} /> (806) 499-3307
-              </button>
-            </a>
-          </div>
+          <a href="tel:+18063403895">
+            <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
+              <Phone size={16} /> (806) 340-3895
+            </button>
+          </a>
         </motion.div>
 
         {/* Menu Grid */}

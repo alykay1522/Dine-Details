@@ -166,9 +166,6 @@ export default function Home() {
                     <a href="tel:+18063403895" className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-2 text-sm font-semibold">
                       <Phone size={13} /> (806) 340-3895
                     </a>
-                    <a href="tel:+18064993307" className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-1 text-sm font-semibold">
-                      <Phone size={13} /> (806) 499-3307
-                    </a>
                   </div>
                 </div>
               </div>
