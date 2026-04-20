@@ -134,7 +134,7 @@ export default function Home() {
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
                   Tim and Rene Vogler started This Little Piggy as a food truck with a simple dream — bring bold, satisfying food to the Texas Panhandle. 
-                  From wings and burgers to pizza and baked potatoes, every dish is made with love at their home on Chaparral Road in Canyon, TX.
+                  From wings and burgers to pizza and baked potatoes, every dish is made with love at their restaurant on Chaparral Road in Canyon, TX.
                 </p>
               </div>
 
