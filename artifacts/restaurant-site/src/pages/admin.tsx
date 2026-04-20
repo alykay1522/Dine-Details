@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useListSpecials, useCreateSpecial, useUpdateSpecial, useDeleteSpecial, getListSpecialsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { format, parseISO } from "date-fns";
-import { Plus, Edit2, Trash2, QrCode, Link as LinkIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Plus, Edit2, Trash2, QrCode, Link as LinkIcon, ImagePlus, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useUpload } from "@workspace/object-storage-web";
 
 export default function Admin() {
   const { data: specials, isLoading } = useListSpecials();
@@ -21,6 +22,18 @@ export default function Admin() {
   const createSpecial = useCreateSpecial();
   const updateSpecial = useUpdateSpecial();
   const deleteSpecial = useDeleteSpecial();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile, isUploading } = useUpload({
+    onSuccess: (response) => {
+      const imageUrl = `/api/storage${response.objectPath}`;
+      setFormData(prev => ({ ...prev, imageUrl }));
+      toast({ title: "Image uploaded!" });
+    },
+    onError: () => {
+      toast({ title: "Image upload failed", variant: "destructive" });
+    },
+  });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSpecial, setEditingSpecial] = useState<any>(null);
@@ -174,7 +187,9 @@ export default function Admin() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="daily">Daily Special</SelectItem>
-                              <SelectItem value="weekly">Weekly Feature</SelectItem>
+                              <SelectItem value="soup">Soup</SelectItem>
+                              <SelectItem value="salad">Salad</SelectItem>
+                              <SelectItem value="dessert">Dessert</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -186,8 +201,42 @@ export default function Admin() {
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <Label htmlFor="imageUrl">Image URL (optional)</Label>
-                        <Input id="imageUrl" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://..." />
+                        <Label>Photo (optional)</Label>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) await uploadFile(file);
+                          }}
+                        />
+                        {formData.imageUrl ? (
+                          <div className="relative rounded-xl overflow-hidden border border-border">
+                            <img src={formData.imageUrl} alt="preview" className="w-full h-40 object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setFormData(prev => ({ ...prev, imageUrl: "" }))}
+                              className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1 text-destructive hover:bg-destructive hover:text-white transition-colors"
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="flex items-center justify-center gap-3 h-24 rounded-xl border-2 border-dashed border-border hover:border-primary/60 hover:bg-primary/5 transition-colors disabled:opacity-50 cursor-pointer"
+                          >
+                            {isUploading ? (
+                              <><Loader2 size={20} className="animate-spin text-primary" /><span className="text-sm text-muted-foreground">Uploading…</span></>
+                            ) : (
+                              <><ImagePlus size={20} className="text-muted-foreground" /><span className="text-sm text-muted-foreground">Tap to upload a photo</span></>
+                            )}
+                          </button>
+                        )}
                       </div>
 
                       <div className="flex items-center space-x-2 mt-2">
@@ -221,7 +270,7 @@ export default function Admin() {
                         <div className="flex items-center gap-3 mb-1">
                           <h3 className="font-medium text-lg">{special.title}</h3>
                           <span className="text-xs uppercase tracking-wider px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
-                            {special.category}
+                            {{ daily: "Daily Special", soup: "Soup", salad: "Salad", dessert: "Dessert" }[special.category] ?? special.category}
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground line-clamp-1">{special.description}</p>
