@@ -34,7 +34,7 @@ export default function Admin() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-border">
+        <div className="flex gap-0 mb-8 border-b border-border overflow-x-auto">
           {([
             { key: "specials", label: "Specials", icon: UtensilsCrossed },
             { key: "gallery", label: "Gallery", icon: Image },
@@ -43,7 +43,7 @@ export default function Admin() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className="flex items-center gap-2 px-5 py-3 font-bold text-sm transition-all border-b-2 -mb-px"
+              className="flex items-center gap-2 px-4 sm:px-5 py-3 font-bold text-sm transition-all border-b-2 -mb-px whitespace-nowrap shrink-0"
               style={{
                 borderColor: activeTab === key ? "var(--piggy-pink)" : "transparent",
                 color: activeTab === key ? "var(--piggy-pink)" : "var(--muted-foreground)",
