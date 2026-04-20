@@ -26,17 +26,92 @@ import {
 
 type Tab = "specials" | "gallery" | "siteinfo" | "menu";
 
+const ADMIN_PASSWORD = "Piggy2025!";
+const AUTH_KEY = "tlp_admin_auth";
+
+function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState(false);
+  const [shaking, setShaking] = useState(false);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pw === ADMIN_PASSWORD) {
+      localStorage.setItem(AUTH_KEY, "1");
+      onSuccess();
+    } else {
+      setError(true);
+      setShaking(true);
+      setPw("");
+      setTimeout(() => setShaking(false), 600);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <motion.div
+        animate={shaking ? { x: [-12, 12, -10, 10, -6, 6, 0] } : { x: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-sm"
+      >
+        <div className="rounded-2xl border border-border bg-black/60 p-8 shadow-2xl text-center" style={{ borderColor: "var(--piggy-pink)" }}>
+          <div className="text-5xl mb-4">🐷</div>
+          <h1 className="font-serif text-2xl font-bold mb-1" style={{ color: "var(--piggy-pink)" }}>Admin Portal</h1>
+          <p className="text-muted-foreground text-sm mb-6">This Little Piggy Serves Food</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={pw}
+                onChange={e => { setPw(e.target.value); setError(false); }}
+                autoFocus
+                autoComplete="current-password"
+                className="text-center tracking-widest"
+                style={error ? { borderColor: "#ff4444" } : {}}
+              />
+              {error && <p className="text-xs mt-1" style={{ color: "#ff4444" }}>Incorrect password. Try again.</p>}
+            </div>
+            <Button
+              type="submit"
+              className="w-full font-bold"
+              style={{ background: "var(--piggy-pink)", color: "#000" }}
+            >
+              Sign In
+            </Button>
+          </form>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<Tab>("specials");
+  const [authed, setAuthed] = useState<boolean>(() => localStorage.getItem(AUTH_KEY) === "1");
   const { toast } = useToast();
   const menuUrl = `${window.location.origin}/menu`;
+
+  if (!authed) {
+    return <AdminLogin onSuccess={() => setAuthed(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-background pt-12 pb-24">
       <div className="container mx-auto px-6 md:px-12 max-w-6xl">
-        <div className="mb-10">
-          <h1 className="font-serif text-4xl font-bold mb-1" style={{ color: "var(--piggy-pink)" }}>Admin Portal</h1>
-          <p className="text-muted-foreground">Manage your gallery, specials, and site info.</p>
+        <div className="mb-10 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="font-serif text-4xl font-bold mb-1" style={{ color: "var(--piggy-pink)" }}>Admin Portal</h1>
+            <p className="text-muted-foreground">Manage your gallery, specials, and site info.</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-1 shrink-0"
+            onClick={() => { localStorage.removeItem(AUTH_KEY); setAuthed(false); }}
+          >
+            Sign Out
+          </Button>
         </div>
 
         {/* Tabs */}
