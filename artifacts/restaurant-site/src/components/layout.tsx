@@ -125,7 +125,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <img src={logoImg} alt="This Little Piggy Serves Food" className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow-lg shadow-primary/30 mb-4" />
             <span className="font-serif text-2xl font-bold text-primary">This Little Piggy Serves Food</span>
             <p className="text-muted-foreground text-sm mt-2 max-w-xs text-center">
-              Family-owned by Tim and Rene Vogler. Serving Canyon, TX with love since Day 1.
+              Family-owned by Tim and Rene Vogler. Serving Canyon, TX and surrounding areas with big flavors and even bigger butts!
             </p>
           </div>
 

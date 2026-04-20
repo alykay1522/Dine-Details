@@ -61,7 +61,7 @@ export default function Home() {
               <span className="text-accent italic">Serves Food!</span>
             </h1>
             <p className="text-lg md:text-xl text-white/85 mb-10 max-w-lg mx-auto md:mx-0 font-light">
-              Family-owned by Tim and Rene Vogler. Started as a food truck, now serving Canyon, TX with big flavors and even bigger hearts.
+              Family-owned by Tim and Rene Vogler. Started as a food truck, now serving Canyon, TX and surrounding areas with big flavors and even bigger butts!
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link href="/menu">
