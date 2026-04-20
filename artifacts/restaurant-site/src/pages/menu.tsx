@@ -150,12 +150,14 @@ export default function Menu() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h1 className="font-serif text-5xl md:text-6xl text-foreground mb-4">Our Menu</h1>
-          <div className="h-px w-24 bg-primary mx-auto mb-6"></div>
+          <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
+            <span className="text-primary">Our</span> <span className="text-accent">Menu</span>
+          </h1>
+          <div className="h-1 w-24 bg-primary mx-auto mb-6 rounded-full"></div>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             19501 Chaparral Rd, Canyon, TX 79015
           </p>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 font-semibold">
             (806) 340-3895 &nbsp;|&nbsp; (806) 499-3307
           </p>
         </motion.div>
