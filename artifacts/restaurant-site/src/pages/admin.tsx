@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Settings, UtensilsCrossed, Download, BookOpen, ChevronDown, ChevronRight, Palette } from "lucide-react";
-import qrImg from "@assets/QRcode_1776661601502.png";
+import { QRCodeCanvas } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
 import { useUpload } from "@workspace/object-storage-web";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
@@ -510,19 +510,30 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
         <div className="bg-card rounded-lg border border-border p-6 sticky top-28">
           <h2 className="font-serif text-2xl mb-6">Menu QR Code</h2>
           <div className="flex flex-col items-center">
-            <img
-              src={qrImg}
-              alt="Menu & Specials QR Code"
-              className="w-56 h-56 object-contain rounded-2xl mb-4"
-            />
-            <a
-              href={qrImg}
-              download="TLP-Menu-QRCode.png"
+            <div id="qr-canvas-wrap" className="p-4 rounded-2xl mb-4" style={{ background: "#fff" }}>
+              <QRCodeCanvas
+                value={menuUrl}
+                size={200}
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+            <button
+              onClick={() => {
+                const canvas = document.querySelector("#qr-canvas-wrap canvas") as HTMLCanvasElement | null;
+                if (!canvas) return;
+                const link = document.createElement("a");
+                link.download = "TLP-Menu-QRCode.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+              }}
               className="flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full mb-5 transition-colors"
               style={{ background: "var(--piggy-pink)", color: "#000" }}
             >
               <Download size={15} /> Download QR Code
-            </a>
+            </button>
             <p className="text-sm text-center text-muted-foreground mb-6">Print and place on tables so guests can pull up the menu &amp; specials.</p>
             <div className="w-full">
               <Label className="text-xs text-muted-foreground mb-2 block uppercase tracking-widest">Direct Link</Label>
