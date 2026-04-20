@@ -1,114 +1,167 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useListGallery } from "@workspace/api-client-react";
-import { X } from "lucide-react";
-import heroImg from "@/assets/images/hero.png";
-import starterImg from "@/assets/images/starter.png";
-import main1Img from "@/assets/images/main1.png";
-import main2Img from "@/assets/images/main2.png";
-import dessertImg from "@/assets/images/dessert.png";
-import drinkImg from "@/assets/images/drink.png";
-import interior1Img from "@/assets/images/interior1.png";
-import interior2Img from "@/assets/images/interior2.png";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Fallback images in case the API is empty
-const FALLBACK_GALLERY = [
-  { id: 1, imageUrl: heroImg, caption: "Farm to table spread", sortOrder: 1 },
-  { id: 2, imageUrl: interior1Img, caption: "Our dining room", sortOrder: 2 },
-  { id: 3, imageUrl: main1Img, caption: "Herb roasted chicken", sortOrder: 3 },
-  { id: 4, imageUrl: drinkImg, caption: "Botanical spritz", sortOrder: 4 },
-  { id: 5, imageUrl: interior2Img, caption: "Cozy corners", sortOrder: 5 },
-  { id: 6, imageUrl: main2Img, caption: "Handmade pappardelle", sortOrder: 6 },
-  { id: 7, imageUrl: starterImg, caption: "Heirloom burrata", sortOrder: 7 },
-  { id: 8, imageUrl: dessertImg, caption: "Rustic fruit tart", sortOrder: 8 },
+import img1 from "@assets/1000017237_1776656424748.jpg";
+import img2 from "@assets/1000017238_1776656424749.jpg";
+import img3 from "@assets/1000017239_1776656424750.jpg";
+import img4 from "@assets/1000017240_1776656424751.jpg";
+import img5 from "@assets/1000017241_1776656424752.jpg";
+import img6 from "@assets/1000017242_1776656424753.jpg";
+import img7 from "@assets/1000017243_1776656424754.jpg";
+import img8 from "@assets/1000017244_1776656424756.jpg";
+import img9 from "@assets/1000017245_1776656424757.jpg";
+import img10 from "@assets/1000017246_1776656424758.jpg";
+import img11 from "@assets/1000017247_1776656424760.jpg";
+import img12 from "@assets/1000017248_1776656424761.jpg";
+import truckFront from "@assets/foodtruckfront_1776656329344.jpg";
+import truckBack from "@assets/Foodtruck_1776656329342.jpg";
+import msPiggy from "@assets/msPiggy_1776656228023.jpg";
+
+const GALLERY = [
+  { id: 1, src: img1, caption: "Fresh from the kitchen" },
+  { id: 2, src: img2, caption: "Handmade with love" },
+  { id: 3, src: img3, caption: "Big flavors" },
+  { id: 4, src: img4, caption: "Made to order" },
+  { id: 5, src: img5, caption: "Texas Panhandle favorites" },
+  { id: 6, src: img6, caption: "Served hot" },
+  { id: 7, src: img7, caption: "Come hungry" },
+  { id: 8, src: img8, caption: "Something for everyone" },
+  { id: 9, src: img9, caption: "Family favorites" },
+  { id: 10, src: img10, caption: "Canyon, TX eats" },
+  { id: 11, src: img11, caption: "Tim & Rene's kitchen" },
+  { id: 12, src: img12, caption: "Every bite counts" },
+  { id: 13, src: truckFront, caption: "The original food truck" },
+  { id: 14, src: truckBack, caption: "Honk if you like my butt!" },
+  { id: 15, src: msPiggy, caption: "The face of This Little Piggy" },
 ];
 
 export default function Gallery() {
-  const { data: apiGallery, isLoading } = useListGallery();
-  const [selectedImage, setSelectedImage] = useState<{imageUrl: string, caption?: string | null} | null>(null);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
-  const gallery = apiGallery && apiGallery.length > 0 ? apiGallery : FALLBACK_GALLERY;
+  const openLightbox = (idx: number) => setLightboxIdx(idx);
+  const closeLightbox = () => setLightboxIdx(null);
+
+  const goPrev = () => {
+    if (lightboxIdx === null) return;
+    setLightboxIdx((lightboxIdx - 1 + GALLERY.length) % GALLERY.length);
+  };
+
+  const goNext = () => {
+    if (lightboxIdx === null) return;
+    setLightboxIdx((lightboxIdx + 1) % GALLERY.length);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowLeft") goPrev();
+    if (e.key === "ArrowRight") goNext();
+    if (e.key === "Escape") closeLightbox();
+  };
 
   return (
-    <div className="min-h-screen bg-background pt-12 pb-24">
+    <div className="min-h-screen bg-background pt-12 pb-24" onKeyDown={handleKeyDown}>
       <div className="container mx-auto px-6 md:px-12">
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
-          <h1 className="font-serif text-5xl md:text-6xl text-foreground mb-6">Gallery</h1>
-          <div className="h-px w-24 bg-primary mx-auto mb-6"></div>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto italic">
-            Glimpses of life, food, and atmosphere at The Harvest Table.
+          <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
+            <span className="text-primary">Food</span> <span className="text-accent">Gallery</span>
+          </h1>
+          <div className="h-1 w-24 bg-primary mx-auto mb-6 rounded-full"></div>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            A peek at the delicious food coming out of This Little Piggy's kitchen every day.
           </p>
         </motion.div>
 
-        {isLoading ? (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-muted animate-pulse rounded-xl w-full" style={{ height: `${Math.random() * 200 + 200}px` }}></div>
-            ))}
-          </div>
-        ) : (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-            {gallery.sort((a,b) => a.sortOrder - b.sortOrder).map((photo, index) => (
-              <motion.div
-                key={photo.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="break-inside-avoid cursor-pointer group relative overflow-hidden rounded-xl"
-                onClick={() => setSelectedImage({ imageUrl: photo.imageUrl, caption: photo.caption })}
-              >
-                <img 
-                  src={photo.imageUrl} 
-                  alt={photo.caption || "Gallery image"} 
-                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
-                  loading="lazy"
-                />
-                {photo.caption && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                    <p className="text-white p-6 font-serif text-lg">{photo.caption}</p>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        )}
+        {/* Masonry Grid */}
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+          {GALLERY.map((photo, index) => (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
+              className="break-inside-avoid cursor-pointer group relative overflow-hidden rounded-2xl border border-border hover:border-primary/60 transition-colors shadow-md shadow-black/40"
+              onClick={() => openLightbox(index)}
+            >
+              <img
+                src={photo.src}
+                alt={photo.caption}
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              {/* Caption overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pointer-events-none">
+                <p className="text-white p-4 font-serif text-base font-semibold">{photo.caption}</p>
+              </div>
+              {/* Pink corner accent */}
+              <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shadow-primary/50" />
+            </motion.div>
+          ))}
+        </div>
       </div>
 
+      {/* Lightbox */}
       <AnimatePresence>
-        {selectedImage && (
+        {lightboxIdx !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-12"
-            onClick={() => setSelectedImage(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+            onClick={closeLightbox}
           >
-            <button 
-              className="absolute top-6 right-6 text-white/70 hover:text-white p-2"
-              onClick={() => setSelectedImage(null)}
+            {/* Close */}
+            <button
+              className="absolute top-4 right-4 z-10 text-white/70 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              onClick={closeLightbox}
             >
-              <X size={32} />
+              <X size={28} />
             </button>
+
+            {/* Prev */}
+            <button
+              className="absolute left-4 z-10 text-white/70 hover:text-white p-3 rounded-full bg-white/10 hover:bg-primary/80 transition-colors"
+              onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            >
+              <ChevronLeft size={28} />
+            </button>
+
+            {/* Next */}
+            <button
+              className="absolute right-4 z-10 text-white/70 hover:text-white p-3 rounded-full bg-white/10 hover:bg-primary/80 transition-colors"
+              onClick={(e) => { e.stopPropagation(); goNext(); }}
+            >
+              <ChevronRight size={28} />
+            </button>
+
+            {/* Image */}
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="max-w-5xl max-h-[85vh] relative flex flex-col"
+              key={lightboxIdx}
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col items-center max-w-4xl max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
-              <img 
-                src={selectedImage.imageUrl} 
-                alt={selectedImage.caption || "Enlarged gallery image"} 
-                className="w-auto max-h-[80vh] object-contain rounded-lg"
+              <img
+                src={GALLERY[lightboxIdx].src}
+                alt={GALLERY[lightboxIdx].caption}
+                className="max-h-[80vh] max-w-full object-contain rounded-xl border-2 border-primary/40 shadow-2xl"
               />
-              {selectedImage.caption && (
-                <p className="text-white text-center mt-4 font-serif text-xl">{selectedImage.caption}</p>
-              )}
+              <p className="text-white mt-4 font-serif text-lg text-center">
+                {GALLERY[lightboxIdx].caption}
+              </p>
+              <p className="text-muted-foreground text-sm mt-1">
+                {lightboxIdx + 1} / {GALLERY.length}
+              </p>
             </motion.div>
           </motion.div>
         )}
