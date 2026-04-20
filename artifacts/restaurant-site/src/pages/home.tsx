@@ -8,6 +8,7 @@ import msPiggyImg from "@assets/msPiggy_1776656228023.jpg";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
 import truckFrontImg from "@assets/foodtruckfront_1776656329344.jpg";
 import truckBackImg from "@assets/Foodtruck_1776656329342.jpg";
+import jerkeyImg from "@assets/1000017238_1776656424749.jpg";
 
 export default function Home() {
   const { data: specials, isLoading } = useGetCurrentSpecials();
@@ -78,6 +79,49 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
+
+      {/* Jerky Announcement Banner */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="relative overflow-hidden bg-accent py-10 px-6"
+      >
+        {/* Subtle pattern bg */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 0, transparent 50%)", backgroundSize: "12px 12px" }} />
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Jerky image */}
+            <div className="shrink-0">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden border-4 border-background/40 shadow-2xl shadow-black/40 rotate-2">
+                <img
+                  src={jerkeyImg}
+                  alt="This Little Piggy Homemade Beef Jerky"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            {/* Text */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-block bg-background/20 text-background font-bold text-xs uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+                🔥 New Offering
+              </div>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold text-background leading-tight mb-2">
+                Now Making Homemade Jerky!
+              </h2>
+              <p className="text-background/80 text-base md:text-lg mb-5">
+                Little Piggy's own handcrafted beef jerky — bold flavor, made right here in Canyon, TX. Call us for details, flavors & ordering!
+              </p>
+              <a href="tel:+18063403895">
+                <Button size="lg" className="bg-background text-accent hover:bg-background/90 font-bold rounded-full px-8 shadow-lg text-base flex items-center gap-2 mx-auto md:mx-0 w-fit">
+                  <Phone size={18} /> Call for Details — (806) 340-3895
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </motion.section>
 
       {/* Info Section */}
       <section className="py-20 bg-background">
