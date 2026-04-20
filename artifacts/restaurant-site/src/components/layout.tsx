@@ -135,6 +135,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <p className="text-muted-foreground text-sm flex flex-col gap-1">
                 <span>19501 Chaparral Road</span>
                 <span>Canyon, TX 79015</span>
+                <span className="text-foreground/60 italic">Located inside the Country Club</span>
                 <a href="tel:+18063403895" className="text-accent hover:text-accent/80 transition-colors mt-1">(806) 340-3895</a>
               </p>
             </div>

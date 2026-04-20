@@ -208,7 +208,8 @@ export default function Home() {
                     <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Find Us</h3>
                     <p className="text-muted-foreground text-sm leading-loose">
                       19501 Chaparral Road<br/>
-                      Canyon, TX 79015
+                      Canyon, TX 79015<br/>
+                      <span className="text-foreground/70 italic">Located inside the Country Club</span>
                     </p>
                     <a href="tel:+18063403895" className="flex items-center gap-1 mt-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ color: "var(--piggy-yellow)" }}>
                       <Phone size={13} /> (806) 340-3895
