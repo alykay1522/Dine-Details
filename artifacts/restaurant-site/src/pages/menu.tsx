@@ -1,176 +1,11 @@
 import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
-
-
-type MenuItem = {
-  name: string;
-  description?: string;
-  price?: string;
-  note?: string;
-};
-
-type MenuCategory = {
-  name: string;
-  subtitle?: string;
-  items: MenuItem[];
-  color?: string;
-  icon?: string;
-};
-
-const MENU: MenuCategory[] = [
-  {
-    name: "Appetizers",
-    color: "#FF4FA3",
-    icon: "🐷",
-    items: [
-      { name: "Cheese Curds", price: "$6" },
-      { name: "Fried Okra", price: "$6" },
-      { name: "Zucchini Sticks", price: "$6" },
-      { name: "Jalapeno Bottle Caps", price: "$6" },
-      { name: "Munchers", price: "$6" },
-      { name: "Fried Pickles", price: "$6" },
-    ],
-  },
-  {
-    name: "Anytime Omelette",
-    subtitle: "3 Egg Omelette served with Toast",
-    color: "#A45CFF",
-    icon: "🍳",
-    items: [
-      { name: "Cheese Only", price: "$10" },
-      { name: "Up to Three Items", price: "$12" },
-      { name: "Up to Five Items", price: "$14" },
-    ],
-  },
-  {
-    name: "Nachos",
-    color: "#FF8A3D",
-    icon: "🌶️",
-    items: [
-      { name: "Chips and Salsa", price: "$6" },
-      { name: "Queso", price: "$8" },
-    ],
-  },
-  {
-    name: "Quesadilla",
-    subtitle: "Chicken, Beef or Cheese",
-    color: "#FF8A3D",
-    icon: "🫓",
-    items: [
-      { name: "½ Quesadilla", price: "$10" },
-      { name: "1 Quesadilla", price: "$15" },
-    ],
-  },
-  {
-    name: "Sides",
-    color: "#FFE55C",
-    icon: "🍟",
-    items: [
-      { name: "Handcut Fries", price: "$5" },
-      { name: "Piggy Fries", price: "$5" },
-      { name: "Wedges", price: "$5", note: "+add chili or cheese for $2 each" },
-    ],
-  },
-  {
-    name: "Wings",
-    color: "#FF8A3D",
-    icon: "🔥",
-    items: [
-      { name: "6 Wings", price: "$8" },
-      { name: "12 Wings", price: "$15", note: "+add a side $3 | +add an appetizer $5" },
-    ],
-  },
-  {
-    name: "Big Baked Potato",
-    color: "#FFE55C",
-    icon: "🥔",
-    items: [
-      { name: "Butter and Sour Cream", price: "$10" },
-      { name: "Bacon, Sour Cream, and Cheese", price: "$12" },
-      { name: "Chili and Cheese", price: "$12" },
-    ],
-  },
-  {
-    name: "Patty Melt",
-    subtitle: "⅓ lb Burger on Rye with Grilled Onion and Swiss Cheese",
-    color: "#3ED6C4",
-    icon: "🥩",
-    items: [
-      { name: "Patty Melt", price: "$12", note: "+add a side $3 | +add an appetizer $5" },
-    ],
-  },
-  {
-    name: "Sandwiches",
-    color: "#3ED6C4",
-    icon: "🥪",
-    items: [
-      { name: "Club", price: "$12" },
-      { name: "Grilled Cheese", price: "$8" },
-      { name: "Ham and Cheese", price: "$10" },
-      { name: "Turkey and Cheese", price: "$10" },
-      { name: "BLT", price: "$12" },
-    ],
-  },
-  {
-    name: "Burgers",
-    subtitle: "½ lb hand-pressed patty",
-    color: "#FF8A3D",
-    icon: "🍔",
-    items: [
-      { name: "½ lb Burger", price: "$10" },
-      { name: "½ lb Burger with Cheese", price: "$11" },
-      { name: "½ lb Burger with Cheese and Bacon", price: "$12" },
-      { name: "Make it a Double", price: "+$5", note: "+add a side $3 | +add an appetizer $5" },
-    ],
-  },
-  {
-    name: '"BaWK BaWK" Sandwiches',
-    subtitle: "Grilled or fried",
-    color: "#3ED6C4",
-    icon: "🐔",
-    items: [
-      { name: "Chicken on a Bun", price: "$10" },
-      { name: "Chicken Bacon Ranch with Cheese", price: "$12" },
-      { name: "Hot Honey, Jalapeno, Bacon Chicken", price: "$12" },
-    ],
-  },
-  {
-    name: "Big'O Hotdogs",
-    color: "#FF4FA3",
-    icon: "🌭",
-    items: [
-      { name: "¼ lb All Beef Frank", price: "$6" },
-      { name: "¼ lb Beef Frank with Sauerkraut", price: "$6" },
-      { name: "¼ lb Chili Cheese Dog", price: "$9" },
-    ],
-  },
-  {
-    name: "Baskets",
-    subtitle: "Served with fries",
-    color: "#FF8A3D",
-    icon: "🍤",
-    items: [
-      { name: "3 Chicken Strips and Fries", price: "$14" },
-      { name: "Popcorn Shrimp and Fries", price: "$14" },
-      { name: "2 Catfish and Fries", price: "$14" },
-      { name: "8 PC Chicken Nugget Basket and Fries", price: "$12" },
-    ],
-  },
-  {
-    name: "Kids Meal",
-    color: "#FFE55C",
-    icon: "⭐",
-    items: [
-      { name: "1 Catfish", price: "$6" },
-      { name: "Small Burger", price: "$5", note: "+add cheese $1" },
-      { name: "Chicken Nuggets (5)", price: "$5" },
-      { name: "Corn Dog Nuggets (7)", price: "$5", note: "+add a side $2" },
-    ],
-  },
-];
+import { useMenu } from "@/hooks/use-menu";
 
 export default function Menu() {
+  const { data: menu, isLoading } = useMenu();
+
   return (
     <div className="min-h-screen bg-background pt-12 pb-24 relative overflow-hidden">
       {/* Logo watermark background */}
@@ -225,131 +60,76 @@ export default function Menu() {
           </a>
         </motion.div>
 
+        {/* Loading state */}
+        {isLoading && (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: "var(--piggy-pink)", borderTopColor: "transparent" }} />
+          </div>
+        )}
+
         {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-          {MENU.map((category, catIdx) => {
-            const color = category.color ?? "#FF4FA3";
-            return (
-              <motion.section
-                key={category.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
-              >
-                {/* Colored section header */}
-                <div
-                  className="mb-4 pb-3 flex items-center gap-2"
-                  style={{ borderBottom: `2px solid ${color}` }}
+        {menu && menu.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+            {menu.map((category, catIdx) => {
+              const color = category.color ?? "#FF4FA3";
+              return (
+                <motion.section
+                  key={category.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
                 >
-                  {category.icon && (
-                    <span className="text-xl">{category.icon}</span>
-                  )}
-                  <div>
-                    <h2
-                      className="font-serif text-2xl md:text-3xl font-bold"
-                      style={{ color }}
-                    >
-                      {category.name}
-                    </h2>
-                    {category.subtitle && (
-                      <p className="text-muted-foreground text-sm italic mt-0.5">{category.subtitle}</p>
+                  {/* Colored section header */}
+                  <div
+                    className="mb-4 pb-3 flex items-center gap-2"
+                    style={{ borderBottom: `2px solid ${color}` }}
+                  >
+                    {category.icon && (
+                      <span className="text-xl">{category.icon}</span>
                     )}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  {category.items.map((item) => (
-                    <div key={item.name}>
-                      <div className="flex items-baseline justify-between gap-3">
-                        <span className="font-medium text-foreground">{item.name}</span>
-                        <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2 shrink" />
-                        {item.price && (
-                          <span className="font-serif font-semibold shrink-0" style={{ color }}>
-                            {item.price}
-                          </span>
-                        )}
-                      </div>
-                      {item.note && (
-                        <p className="text-xs text-muted-foreground mt-0.5 italic">{item.note}</p>
+                    <div>
+                      <h2
+                        className="font-serif text-2xl md:text-3xl font-bold"
+                        style={{ color }}
+                      >
+                        {category.name}
+                      </h2>
+                      {category.subtitle && (
+                        <p className="text-muted-foreground text-sm italic mt-0.5">{category.subtitle}</p>
                       )}
                     </div>
-                  ))}
-                </div>
-              </motion.section>
-            );
-          })}
-        </div>
-
-        {/* Pizza Section */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mt-14"
-        >
-          <div
-            className="mb-6 pb-3 flex items-center gap-2"
-            style={{ borderBottom: "2px solid #A45CFF" }}
-          >
-            <span className="text-xl">🍕</span>
-            <h2 className="font-serif text-2xl md:text-3xl font-bold" style={{ color: "#A45CFF" }}>
-              Pizza
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-8 mb-6">
-            <div>
-              <h3 className="font-serif text-xl mb-4 underline underline-offset-4" style={{ color: "#A45CFF" }}>
-                Small – 12"
-              </h3>
-              <div className="flex flex-col gap-2">
-                {[
-                  { name: "Cheese", price: "$12" },
-                  { name: "1 Topping", price: "$14" },
-                  { name: "3 Toppings", price: "$16" },
-                  { name: "6 Toppings", price: "$18" },
-                ].map(item => (
-                  <div key={item.name} className="flex items-baseline justify-between gap-3">
-                    <span className="font-medium text-foreground">{item.name}</span>
-                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2" />
-                    <span className="font-serif font-semibold shrink-0" style={{ color: "#A45CFF" }}>{item.price}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="font-serif text-xl mb-4 underline underline-offset-4" style={{ color: "#A45CFF" }}>
-                Large – 16"
-              </h3>
-              <div className="flex flex-col gap-2">
-                {[
-                  { name: "Cheese", price: "$14" },
-                  { name: "1 Topping", price: "$16" },
-                  { name: "3 Toppings", price: "$18" },
-                  { name: "6 Toppings", price: "$20" },
-                ].map(item => (
-                  <div key={item.name} className="flex items-baseline justify-between gap-3">
-                    <span className="font-medium text-foreground">{item.name}</span>
-                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2" />
-                    <span className="font-serif font-semibold shrink-0" style={{ color: "#A45CFF" }}>{item.price}</span>
+                  <div className="flex flex-col gap-3">
+                    {category.items.map((item) => (
+                      <div key={item.id}>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="font-medium text-foreground">{item.name}</span>
+                          <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2 shrink" />
+                          {item.price && (
+                            <span className="font-serif font-semibold shrink-0" style={{ color }}>
+                              {item.price}
+                            </span>
+                          )}
+                        </div>
+                        {item.note && (
+                          <p className="text-xs text-muted-foreground mt-0.5 italic">{item.note}</p>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </motion.section>
+              );
+            })}
           </div>
-          <div className="rounded-lg p-6 border border-border" style={{ background: "rgba(164,92,255,0.06)" }}>
-            <h4 className="font-medium text-foreground mb-3">Toppings</h4>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Pepperoni · Sausage · Hamburger · Ham · Bacon · Olives · Bell Peppers · Onions · Jalapenos · Banana Peppers · Mushrooms · Pickles
-            </p>
-            <p className="text-muted-foreground text-sm mt-2 italic">If you don't see it, ask!</p>
-          </div>
-        </motion.section>
+        )}
 
         {/* Disclaimer */}
-        <p className="text-xs text-muted-foreground text-center mt-12 italic">
-          *Consuming raw or undercooked meats, poultry, seafood, or eggs may increase your risk of foodborne illness.
-        </p>
+        {!isLoading && (
+          <p className="text-xs text-muted-foreground text-center mt-12 italic">
+            *Consuming raw or undercooked meats, poultry, seafood, or eggs may increase your risk of foodborne illness.
+          </p>
+        )}
       </div>
     </div>
   );

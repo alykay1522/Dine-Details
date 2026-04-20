@@ -27,7 +27,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 ### API Server (`artifacts/api-server`)
 - Preview path: `/api`
-- Endpoints: `/api/specials`, `/api/specials/current`, `/api/gallery`
+- Endpoints: `/api/specials`, `/api/specials/current`, `/api/gallery`, `/api/settings`, `/api/menu`
+- Menu CRUD: GET /api/menu, POST/PUT/DELETE /api/menu/categories/:id, POST/PUT/DELETE /api/menu/items/:id
 
 ## Key Commands
 
@@ -41,11 +42,23 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 
 - **specials** — daily and weekly restaurant specials (id, title, description, price, imageUrl, category, isActive, featuredDate, createdAt)
 - **gallery** — photo gallery images (id, imageUrl, caption, category, sortOrder, createdAt)
+- **site_settings** — key/value store for site-wide settings (hours, announcement, story text)
+- **menu_categories** — menu section headers (id, name, subtitle, icon, color, sortOrder)
+- **menu_items** — individual menu items linked to a category (id, categoryId, name, description, price, note, sortOrder)
+
+## Admin Portal (`/admin`)
+
+Four tabs:
+1. **Specials** — add/edit/delete daily specials with image upload and QR code display
+2. **Menu** — full CRUD for all menu categories and items (add/edit/delete, color picker, emoji icon)
+3. **Gallery** — upload new photos and delete existing ones
+4. **Site Info** — edit business hours, announcement banner (on/off, title, body), and the Our Story paragraph
 
 ## Notes
 
-- Prices stored as plain numbers (e.g., "34"), frontend adds `$` prefix
-- Admin page at `/admin` for managing specials
+- Menu page loads from DB via `/api/menu`; first load auto-seeds the full menu from hardcoded defaults
+- Settings use a key/value pattern via `/api/settings` with `ensureDefaults()` seeding on first GET
 - `lib/api-zod/src/index.ts` should only export from `./generated/api` (not types barrel) to avoid TS2308 ambiguity errors
+- Menu hooks (`use-menu.ts`) and settings hooks (`use-settings.ts`) use direct fetch (not codegen) for simplicity
 
 See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details.

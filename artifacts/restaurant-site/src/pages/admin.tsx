@@ -13,13 +13,18 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Settings, UtensilsCrossed, Download } from "lucide-react";
+import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Settings, UtensilsCrossed, Download, BookOpen, ChevronDown, ChevronRight, Palette } from "lucide-react";
 import qrImg from "@assets/QRcode_1776661601502.png";
 import { useToast } from "@/hooks/use-toast";
 import { useUpload } from "@workspace/object-storage-web";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
+import {
+  useMenu, useCreateCategory, useUpdateCategory, useDeleteCategory,
+  useCreateMenuItem, useUpdateMenuItem, useDeleteMenuItem,
+  type MenuCategoryData, type MenuItemData,
+} from "@/hooks/use-menu";
 
-type Tab = "specials" | "gallery" | "siteinfo";
+type Tab = "specials" | "gallery" | "siteinfo" | "menu";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState<Tab>("specials");
@@ -38,6 +43,7 @@ export default function Admin() {
         <div className="flex gap-0 mb-8 border-b border-border overflow-x-auto">
           {([
             { key: "specials", label: "Specials", icon: UtensilsCrossed },
+            { key: "menu", label: "Menu", icon: BookOpen },
             { key: "gallery", label: "Gallery", icon: Image },
             { key: "siteinfo", label: "Site Info", icon: Settings },
           ] as { key: Tab; label: string; icon: React.ElementType }[]).map(({ key, label, icon: Icon }) => (
@@ -56,6 +62,7 @@ export default function Admin() {
         </div>
 
         {activeTab === "specials" && <SpecialsTab menuUrl={menuUrl} toast={toast} />}
+        {activeTab === "menu" && <MenuTab toast={toast} />}
         {activeTab === "gallery" && <GalleryTab toast={toast} />}
         {activeTab === "siteinfo" && <SiteInfoTab toast={toast} />}
       </div>
@@ -64,6 +71,195 @@ export default function Admin() {
 }
 
 /* ─── SPECIALS TAB ─── */
+const COLOR_OPTIONS = [
+  { label: "Pink", value: "#FF4FA3" },
+  { label: "Purple", value: "#A45CFF" },
+  { label: "Teal", value: "#3ED6C4" },
+  { label: "Orange", value: "#FF8A3D" },
+  { label: "Yellow", value: "#FFE55C" },
+];
+
+function MenuTab({ toast }: { toast: any }) {
+  const { data: menu, isLoading } = useMenu();
+  const createCat = useCreateCategory();
+  const updateCat = useUpdateCategory();
+  const deleteCat = useDeleteCategory();
+  const createItem = useCreateMenuItem();
+  const updateItem = useUpdateMenuItem();
+  const deleteItem = useDeleteMenuItem();
+
+  const [expandedCats, setExpandedCats] = useState<Set<number>>(new Set());
+  const toggleCat = (id: number) => setExpandedCats(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const [catDialog, setCatDialog] = useState<{ open: boolean; editing: MenuCategoryData | null }>({ open: false, editing: null });
+  const [catForm, setCatForm] = useState({ name: "", subtitle: "", icon: "", color: "#FF4FA3" });
+
+  const openNewCat = () => { setCatForm({ name: "", subtitle: "", icon: "", color: "#FF4FA3" }); setCatDialog({ open: true, editing: null }); };
+  const openEditCat = (cat: MenuCategoryData) => { setCatForm({ name: cat.name, subtitle: cat.subtitle ?? "", icon: cat.icon ?? "", color: cat.color }); setCatDialog({ open: true, editing: cat }); };
+  const saveCat = async () => {
+    if (!catForm.name.trim()) return;
+    if (catDialog.editing) {
+      await updateCat.mutateAsync({ id: catDialog.editing.id, ...catForm, sortOrder: catDialog.editing.sortOrder });
+      toast({ title: "Category updated!" });
+    } else {
+      const sortOrder = (menu?.length ?? 0);
+      await createCat.mutateAsync({ ...catForm, sortOrder });
+      toast({ title: "Category added!" });
+    }
+    setCatDialog({ open: false, editing: null });
+  };
+
+  const [itemDialog, setItemDialog] = useState<{ open: boolean; categoryId: number; editing: MenuItemData | null }>({ open: false, categoryId: 0, editing: null });
+  const [itemForm, setItemForm] = useState({ name: "", price: "", note: "" });
+
+  const openNewItem = (categoryId: number) => { setItemForm({ name: "", price: "", note: "" }); setItemDialog({ open: true, categoryId, editing: null }); };
+  const openEditItem = (item: MenuItemData) => { setItemForm({ name: item.name, price: item.price ?? "", note: item.note ?? "" }); setItemDialog({ open: true, categoryId: item.categoryId, editing: item }); };
+  const saveItem = async () => {
+    if (!itemForm.name.trim()) return;
+    if (itemDialog.editing) {
+      await updateItem.mutateAsync({ id: itemDialog.editing.id, ...itemForm });
+      toast({ title: "Item updated!" });
+    } else {
+      const cat = menu?.find(c => c.id === itemDialog.categoryId);
+      await createItem.mutateAsync({ categoryId: itemDialog.categoryId, ...itemForm, sortOrder: cat?.items.length ?? 0 });
+      toast({ title: "Item added!" });
+    }
+    setItemDialog({ open: false, categoryId: 0, editing: null });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="font-serif text-2xl font-bold text-foreground">Menu Editor</h2>
+          <p className="text-muted-foreground text-sm mt-1">Add, edit, or remove categories and items. Changes appear on the menu page instantly.</p>
+        </div>
+        <Button onClick={openNewCat} style={{ background: "var(--piggy-pink)", color: "#000" }} className="font-bold gap-2">
+          <Plus size={16} /> Add Category
+        </Button>
+      </div>
+
+      {isLoading && <div className="flex justify-center py-12"><Loader2 size={32} className="animate-spin text-primary" /></div>}
+
+      {menu?.map(cat => (
+        <div key={cat.id} className="rounded-lg border border-border overflow-hidden">
+          {/* Category header */}
+          <div
+            className="flex items-center justify-between px-4 py-3 cursor-pointer select-none"
+            style={{ background: `${cat.color}18`, borderLeft: `4px solid ${cat.color}` }}
+            onClick={() => toggleCat(cat.id)}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-lg">{cat.icon}</span>
+              <div className="min-w-0">
+                <span className="font-serif font-bold text-foreground text-base">{cat.name}</span>
+                {cat.subtitle && <span className="text-muted-foreground text-xs ml-2 italic">{cat.subtitle}</span>}
+              </div>
+              <span className="text-xs text-muted-foreground ml-1 shrink-0">({cat.items.length} items)</span>
+            </div>
+            <div className="flex items-center gap-1 shrink-0 ml-2">
+              <button onClick={e => { e.stopPropagation(); openEditCat(cat); }} className="p-1.5 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"><Edit2 size={14} /></button>
+              <button onClick={e => { e.stopPropagation(); deleteCat.mutate(cat.id, { onSuccess: () => toast({ title: "Category deleted" }) }); }} className="p-1.5 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={14} /></button>
+              {expandedCats.has(cat.id) ? <ChevronDown size={16} className="text-muted-foreground" /> : <ChevronRight size={16} className="text-muted-foreground" />}
+            </div>
+          </div>
+
+          {/* Items list */}
+          {expandedCats.has(cat.id) && (
+            <div className="bg-card divide-y divide-border">
+              {cat.items.map(item => (
+                <div key={item.id} className="flex items-center justify-between px-5 py-3 gap-3">
+                  <div className="flex-1 min-w-0">
+                    <span className="font-medium text-foreground text-sm">{item.name}</span>
+                    {item.note && <span className="text-xs text-muted-foreground ml-2 italic">{item.note}</span>}
+                  </div>
+                  <span className="font-serif font-bold text-sm shrink-0" style={{ color: cat.color }}>{item.price}</span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => openEditItem(item)} className="p-1.5 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"><Edit2 size={13} /></button>
+                    <button onClick={() => deleteItem.mutate(item.id, { onSuccess: () => toast({ title: "Item deleted" }) })} className="p-1.5 rounded hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"><Trash2 size={13} /></button>
+                  </div>
+                </div>
+              ))}
+              <div className="px-5 py-3">
+                <button onClick={() => openNewItem(cat.id)} className="flex items-center gap-1.5 text-sm font-bold transition-colors" style={{ color: cat.color }}>
+                  <Plus size={15} /> Add Item
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* Category Dialog */}
+      <Dialog open={catDialog.open} onOpenChange={open => setCatDialog(d => ({ ...d, open }))}>
+        <DialogContent className="bg-card border-border max-w-md">
+          <DialogHeader><DialogTitle>{catDialog.editing ? "Edit Category" : "Add Category"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 mt-2">
+            <div>
+              <Label className="text-xs mb-1 block">Category Name *</Label>
+              <Input value={catForm.name} onChange={e => setCatForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Burgers" />
+            </div>
+            <div>
+              <Label className="text-xs mb-1 block">Subtitle / Description</Label>
+              <Input value={catForm.subtitle} onChange={e => setCatForm(f => ({ ...f, subtitle: e.target.value }))} placeholder="e.g. ½ lb hand-pressed patty" />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <Label className="text-xs mb-1 block">Icon (emoji)</Label>
+                <Input value={catForm.icon} onChange={e => setCatForm(f => ({ ...f, icon: e.target.value }))} placeholder="🍔" className="text-xl" maxLength={4} />
+              </div>
+              <div className="flex-1">
+                <Label className="text-xs mb-2 block flex items-center gap-1"><Palette size={12} /> Color</Label>
+                <div className="flex gap-2 flex-wrap">
+                  {COLOR_OPTIONS.map(c => (
+                    <button key={c.value} title={c.label} onClick={() => setCatForm(f => ({ ...f, color: c.value }))}
+                      className="w-7 h-7 rounded-full border-2 transition-all"
+                      style={{ background: c.value, borderColor: catForm.color === c.value ? "#fff" : "transparent", transform: catForm.color === c.value ? "scale(1.2)" : "scale(1)" }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button onClick={saveCat} disabled={createCat.isPending || updateCat.isPending} className="flex-1 font-bold" style={{ background: "var(--piggy-pink)", color: "#000" }}>
+                {(createCat.isPending || updateCat.isPending) ? <Loader2 size={16} className="animate-spin" /> : catDialog.editing ? "Save Changes" : "Add Category"}
+              </Button>
+              <Button variant="outline" onClick={() => setCatDialog(d => ({ ...d, open: false }))} className="flex-1">Cancel</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Item Dialog */}
+      <Dialog open={itemDialog.open} onOpenChange={open => setItemDialog(d => ({ ...d, open }))}>
+        <DialogContent className="bg-card border-border max-w-md">
+          <DialogHeader><DialogTitle>{itemDialog.editing ? "Edit Item" : "Add Item"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 mt-2">
+            <div>
+              <Label className="text-xs mb-1 block">Item Name *</Label>
+              <Input value={itemForm.name} onChange={e => setItemForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Cheeseburger" />
+            </div>
+            <div>
+              <Label className="text-xs mb-1 block">Price</Label>
+              <Input value={itemForm.price} onChange={e => setItemForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. $12" />
+            </div>
+            <div>
+              <Label className="text-xs mb-1 block">Note (optional)</Label>
+              <Input value={itemForm.note} onChange={e => setItemForm(f => ({ ...f, note: e.target.value }))} placeholder="e.g. +add a side $3" />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button onClick={saveItem} disabled={createItem.isPending || updateItem.isPending} className="flex-1 font-bold" style={{ background: "var(--piggy-pink)", color: "#000" }}>
+                {(createItem.isPending || updateItem.isPending) ? <Loader2 size={16} className="animate-spin" /> : itemDialog.editing ? "Save Changes" : "Add Item"}
+              </Button>
+              <Button variant="outline" onClick={() => setItemDialog(d => ({ ...d, open: false }))} className="flex-1">Cancel</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
   const { data: specials, isLoading } = useListSpecials();
   const queryClient = useQueryClient();
