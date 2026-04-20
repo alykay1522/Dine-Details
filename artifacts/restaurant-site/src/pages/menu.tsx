@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Phone } from "lucide-react";
 import menuImg1 from "@assets/1000017268_1776655893039.jpg";
 import menuImg2 from "@assets/1000017269_1776655893041.jpg";
 
@@ -160,6 +161,30 @@ export default function Menu() {
           <p className="text-muted-foreground mt-1 font-semibold">
             (806) 340-3895 &nbsp;|&nbsp; (806) 499-3307
           </p>
+        </motion.div>
+
+        {/* Call to Order Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 bg-primary/10 border border-primary/30 rounded-2xl px-6 py-5"
+        >
+          <p className="font-serif text-lg font-bold text-foreground text-center sm:text-left">
+            Ready to order? Give us a call!
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a href="tel:+18063403895">
+              <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
+                <Phone size={16} /> (806) 340-3895
+              </button>
+            </a>
+            <a href="tel:+18064993307">
+              <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
+                <Phone size={16} /> (806) 499-3307
+              </button>
+            </a>
+          </div>
         </motion.div>
 
         {/* Menu Grid */}

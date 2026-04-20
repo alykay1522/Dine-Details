@@ -69,11 +69,11 @@ export default function Home() {
                   View Our Menu
                 </Button>
               </Link>
-              <Link href="/specials">
-                <Button size="lg" variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground px-8 w-full sm:w-auto rounded-full font-bold text-base">
-                  Today's Specials
+              <a href="tel:+18063403895">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-8 w-full sm:w-auto rounded-full shadow-lg shadow-accent/30 text-base flex items-center gap-2">
+                  <Phone size={18} /> Call to Place Order
                 </Button>
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
