@@ -71,8 +71,11 @@ export default function Home() {
               <span className="text-primary">This Little Piggy</span><br/>
               <span className="text-accent italic">Serves Food!</span>
             </h1>
-            <p className="font-serif text-2xl md:text-3xl font-bold mb-6" style={{ color: "var(--piggy-pink)" }}>
+            <p className="font-serif text-2xl md:text-3xl font-bold mb-3" style={{ color: "var(--piggy-pink)" }}>
               Home of the Big Butt Sandwich
+            </p>
+            <p className="font-serif text-xl md:text-2xl italic mb-6" style={{ color: "var(--piggy-yellow)" }}>
+              Big flavors that feel like coming home.
             </p>
             <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto md:mx-0 font-light">
               Family-owned by Tim and Rene Vogler. Started as a food truck, now serving Canyon, TX with the best food in the Panhandle.
