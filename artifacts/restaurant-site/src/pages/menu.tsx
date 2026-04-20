@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
+import logoImg from "@assets/LOGOfront_1776656215137.jpg";
 
 
 type MenuItem = {
@@ -141,8 +142,18 @@ const MENU: MenuCategory[] = [
 
 export default function Menu() {
   return (
-    <div className="min-h-screen bg-background pt-12 pb-24">
-      <div className="container mx-auto px-6 md:px-12 max-w-5xl">
+    <div className="min-h-screen bg-background pt-12 pb-24 relative overflow-hidden">
+      {/* Logo watermark background */}
+      <div className="pointer-events-none fixed inset-0 flex items-center justify-center z-0">
+        <img
+          src={logoImg}
+          alt=""
+          className="w-[700px] max-w-[90vw] opacity-[0.06] select-none"
+          style={{ filter: "saturate(0) brightness(2)" }}
+        />
+      </div>
+
+      <div className="container relative z-10 mx-auto px-6 md:px-12 max-w-5xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
