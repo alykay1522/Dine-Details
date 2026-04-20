@@ -14,12 +14,11 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
     setTimeout(() => {
       setIsSubmitting(false);
       toast({
         title: "Message sent",
-        description: "Thank you for reaching out. We'll get back to you soon.",
+        description: "Thank you for reaching out. We'll get back to you soon!",
       });
       (e.target as HTMLFormElement).reset();
     }, 1000);
@@ -37,7 +36,7 @@ export default function Contact() {
           <h1 className="font-serif text-5xl md:text-6xl text-foreground mb-6">Contact Us</h1>
           <div className="h-px w-24 bg-primary mx-auto mb-6"></div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto italic">
-            We'd love to hear from you. Drop us a line or come visit us.
+            We'd love to hear from you. Stop in, call, or send us a message.
           </p>
         </motion.div>
 
@@ -59,8 +58,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-serif text-xl mb-2">Location</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      42 Orchard Lane<br/>
-                      Anytown, USA 12345
+                      19501 Chaparral Road<br/>
+                      Canyon, TX 79015
                     </p>
                   </div>
                 </div>
@@ -72,7 +71,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-serif text-xl mb-2">Phone</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      (555) 0198
+                      <a href="tel:+18063403895" className="hover:text-primary transition-colors">(806) 340-3895</a><br/>
+                      <a href="tel:+18064993307" className="hover:text-primary transition-colors">(806) 499-3307</a>
                     </p>
                   </div>
                 </div>
@@ -84,21 +84,25 @@ export default function Contact() {
                   <div>
                     <h3 className="font-serif text-xl mb-2">Hours</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Mon-Thu: 11am - 9pm<br/>
-                      Fri-Sat: 11am - 10pm<br/>
-                      Sun: 10am - 8pm
+                      Mon-Thu: 11am – 9pm<br/>
+                      Fri-Sat: 11am – 10pm<br/>
+                      Sun: 10am – 8pm
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-12 pt-8 border-t border-border">
+                <h3 className="font-serif text-xl mb-2">Owned by Tim &amp; Rene Vogler</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                  Started as a food truck and grown into a beloved local spot. Come as you are.
+                </p>
                 <h3 className="font-serif text-xl mb-4">Follow Us</h3>
                 <div className="flex gap-4">
-                  <a href="#" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
+                  <a href="#" aria-label="Instagram" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
                     <Instagram size={20} />
                   </a>
-                  <a href="#" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
+                  <a href="#" aria-label="Facebook" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
                     <Facebook size={20} />
                   </a>
                 </div>

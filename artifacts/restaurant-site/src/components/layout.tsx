@@ -42,8 +42,8 @@ export function Layout({ children }: { children: ReactNode }) {
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
           <Link href="/" className="group flex items-center gap-2 z-50">
-            <span className="font-serif text-2xl tracking-tight text-primary transition-colors group-hover:text-primary/80">
-              The Harvest Table
+            <span className="font-serif text-xl md:text-2xl tracking-tight text-primary transition-colors group-hover:text-primary/80">
+              This Little Piggy Serves Food
             </span>
           </Link>
 
@@ -114,16 +114,18 @@ export function Layout({ children }: { children: ReactNode }) {
       <footer className="bg-foreground text-background py-16 mt-auto">
         <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start gap-4">
-            <span className="font-serif text-2xl text-primary-foreground">The Harvest Table</span>
+            <span className="font-serif text-xl text-primary-foreground">This Little Piggy Serves Food</span>
             <p className="text-muted-foreground max-w-xs text-sm">
-              A warm neighborhood farm-to-table restaurant. Unhurried, welcoming, and full of character.
+              Family-owned by Tim and Rene Vogler. Started as a food truck, serving Canyon, TX with big flavors and even bigger portions.
             </p>
           </div>
           <div className="flex flex-col items-center md:items-start gap-4">
             <h4 className="font-serif text-lg text-primary-foreground">Visit Us</h4>
             <p className="text-muted-foreground text-sm flex flex-col gap-1">
-              <span>42 Orchard Lane</span>
-              <span>(555) 0198</span>
+              <span>19501 Chaparral Road</span>
+              <span>Canyon, TX 79015</span>
+              <span className="mt-1">(806) 340-3895</span>
+              <span>(806) 499-3307</span>
             </p>
           </div>
           <div className="flex flex-col items-center md:items-start gap-4">
@@ -136,7 +138,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </div>
         <div className="container mx-auto px-6 md:px-12 mt-16 pt-8 border-t border-muted/20 text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
-          <p>&copy; {new Date().getFullYear()} The Harvest Table. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} This Little Piggy Serves Food LLC. All rights reserved.</p>
           <Link href="/admin" className="hover:text-primary transition-colors">Admin Portal</Link>
         </div>
       </footer>
