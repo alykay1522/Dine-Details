@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useListGallery } from "@workspace/api-client-react";
 
 import img1 from "@assets/1000017237_1776656424748.jpg";
 import img2 from "@assets/1000017238_1776656424749.jpg";
@@ -70,18 +71,25 @@ const GALLERY = [
 
 export default function Gallery() {
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+  const { data: dbPhotos } = useListGallery();
+
+  const allPhotos = useMemo(() => {
+    const staticPhotos = GALLERY.map(p => ({ id: `static-${p.id}`, src: p.src as string, caption: p.caption }));
+    const uploaded = (dbPhotos ?? []).map(p => ({ id: `db-${p.id}`, src: p.imageUrl, caption: p.caption ?? "" }));
+    return [...uploaded, ...staticPhotos];
+  }, [dbPhotos]);
 
   const openLightbox = (idx: number) => setLightboxIdx(idx);
   const closeLightbox = () => setLightboxIdx(null);
 
   const goPrev = () => {
     if (lightboxIdx === null) return;
-    setLightboxIdx((lightboxIdx - 1 + GALLERY.length) % GALLERY.length);
+    setLightboxIdx((lightboxIdx - 1 + allPhotos.length) % allPhotos.length);
   };
 
   const goNext = () => {
     if (lightboxIdx === null) return;
-    setLightboxIdx((lightboxIdx + 1) % GALLERY.length);
+    setLightboxIdx((lightboxIdx + 1) % allPhotos.length);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -112,7 +120,7 @@ export default function Gallery() {
 
         {/* Masonry Grid — 3-col desktop, 2-col tablet, 1-col mobile */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-          {GALLERY.map((photo, index) => (
+          {allPhotos.map((photo, index) => (
             <motion.div
               key={photo.id}
               initial={{ opacity: 0, y: 20 }}
@@ -183,15 +191,15 @@ export default function Gallery() {
               onClick={(e) => e.stopPropagation()}
             >
               <img
-                src={GALLERY[lightboxIdx].src}
-                alt={GALLERY[lightboxIdx].caption}
+                src={allPhotos[lightboxIdx].src}
+                alt={allPhotos[lightboxIdx].caption}
                 className="max-h-[80vh] max-w-full object-contain rounded-xl border-2 border-primary/40 shadow-2xl"
               />
               <p className="text-white mt-4 font-serif text-lg text-center">
-                {GALLERY[lightboxIdx].caption}
+                {allPhotos[lightboxIdx].caption}
               </p>
               <p className="text-muted-foreground text-sm mt-1">
-                {lightboxIdx + 1} / {GALLERY.length}
+                {lightboxIdx + 1} / {allPhotos.length}
               </p>
             </motion.div>
           </motion.div>

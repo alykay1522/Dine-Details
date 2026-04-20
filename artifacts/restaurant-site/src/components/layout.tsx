@@ -5,11 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
+import { useSettings } from "@/hooks/use-settings";
 
 export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: settings } = useSettings();
+  const hoursWeekday = settings?.hours_weekday ?? "Mon-Thu 11am–9pm";
+  const hoursWeekend = settings?.hours_weekend ?? "Fri-Sat 11am–10pm";
+  const hoursSunday = settings?.hours_sunday ?? "Sun 10am–8pm";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -142,9 +147,9 @@ export function Layout({ children }: { children: ReactNode }) {
             <div className="flex flex-col items-center md:items-start gap-2">
               <h4 className="font-serif text-lg font-bold text-primary">Hours</h4>
               <p className="text-muted-foreground text-sm flex flex-col gap-1">
-                <span>Mon-Thu: 11am - 9pm</span>
-                <span>Fri-Sat: 11am - 10pm</span>
-                <span>Sun: 10am - 8pm</span>
+                <span>{hoursWeekday}</span>
+                <span>{hoursWeekend}</span>
+                <span>{hoursSunday}</span>
               </p>
             </div>
             <div className="flex flex-col items-center md:items-start gap-2">
