@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
-import menuImg1 from "@assets/1000017268_1776655893039.jpg";
-import menuImg2 from "@assets/1000017269_1776655893041.jpg";
+
 
 type MenuItem = {
   name: string;
@@ -276,25 +275,6 @@ export default function Menu() {
               Pepperoni · Sausage · Hamburger · Ham · Bacon · Olives · Bell Peppers · Onions · Jalapenos · Banana Peppers · Mushrooms · Pickles
             </p>
             <p className="text-muted-foreground text-sm mt-2 italic">If you don't see it, ask!</p>
-          </div>
-        </motion.section>
-
-        {/* Menu Photo Reference */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mt-20"
-        >
-          <h2 className="font-serif text-2xl text-foreground mb-6 text-center">Full Menu</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-2xl overflow-hidden shadow-lg border border-border">
-              <img src={menuImg1} alt="Menu page 1" className="w-full h-auto object-contain bg-white" />
-            </div>
-            <div className="rounded-2xl overflow-hidden shadow-lg border border-border">
-              <img src={menuImg2} alt="Menu page 2" className="w-full h-auto object-contain bg-white" />
-            </div>
           </div>
         </motion.section>
 
