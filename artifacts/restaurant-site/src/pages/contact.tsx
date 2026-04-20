@@ -122,7 +122,7 @@ export default function Contact() {
                   <a href="#" aria-label="Instagram" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
                     <Instagram size={20} />
                   </a>
-                  <a href="#" aria-label="Facebook" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
+                  <a href="https://www.facebook.com/share/1UJGVfSMCk/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="p-3 bg-card hover:bg-primary hover:text-white border border-border text-foreground rounded-full transition-colors">
                     <Facebook size={20} />
                   </a>
                 </div>

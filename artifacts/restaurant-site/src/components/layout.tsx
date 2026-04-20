@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Facebook } from "lucide-react";
 import { useState, useEffect } from "react";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
 import { useSettings } from "@/hooks/use-settings";
@@ -166,7 +166,18 @@ export function Layout({ children }: { children: ReactNode }) {
 
         <div className="container mx-auto px-6 md:px-12 mt-12 pt-8 border-t border-border text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
           <p>&copy; {new Date().getFullYear()} This Little Piggy Serves Food LLC. All rights reserved.</p>
-          <Link href="/admin" className="hover:text-primary transition-colors">Admin Portal</Link>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://www.facebook.com/share/1UJGVfSMCk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow us on Facebook"
+              className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            >
+              <Facebook size={15} /> Facebook
+            </a>
+            <Link href="/admin" className="hover:text-primary transition-colors">Admin Portal</Link>
+          </div>
         </div>
         </div>
       </footer>
