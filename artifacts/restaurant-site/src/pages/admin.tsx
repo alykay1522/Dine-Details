@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Settings, UtensilsCrossed } from "lucide-react";
-import qrImg from "@assets/QRcode_1776661601502.png";
+import { QRCodeSVG } from "qrcode.react";
+import logoImg from "@assets/LOGOfront_1776656215137.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { useUpload } from "@workspace/object-storage-web";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
@@ -239,9 +240,24 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
         <div className="bg-card rounded-lg border border-border p-6 sticky top-28">
           <h2 className="font-serif text-2xl mb-6">Menu QR Code</h2>
           <div className="flex flex-col items-center">
-            <div className="mb-6">
-              <img src={qrImg} alt="Menu & Specials QR Code" className="w-56 h-56 object-contain rounded-xl" />
+            <div className="mb-4 p-3 rounded-2xl" style={{ background: "#000", border: "3px solid #FF4FA3" }}>
+              <QRCodeSVG
+                value={menuUrl}
+                size={200}
+                bgColor="#000000"
+                fgColor="#FFE55C"
+                level="H"
+                imageSettings={{
+                  src: logoImg,
+                  x: undefined,
+                  y: undefined,
+                  height: 48,
+                  width: 48,
+                  excavate: true,
+                }}
+              />
             </div>
+            <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#FF4FA3" }}>Scan for Menu & Specials</p>
             <p className="text-sm text-center text-muted-foreground mb-6">Place this QR code on tables for guests to pull up your menu.</p>
             <div className="w-full">
               <Label className="text-xs text-muted-foreground mb-2 block uppercase tracking-widest">Direct Link</Label>
