@@ -116,7 +116,7 @@ export default function Home() {
                 </div>
                 {/* Decorative badge */}
                 <div className="absolute -bottom-2 -right-2 bg-accent text-accent-foreground font-serif font-bold text-sm px-4 py-2 rounded-full shadow-lg z-20 border-2 border-background">
-                  Est. Canyon, TX
+                  Est. Vega, TX
                 </div>
               </div>
             </motion.div>
