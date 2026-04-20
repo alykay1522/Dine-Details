@@ -118,7 +118,8 @@ export function Layout({ children }: { children: ReactNode }) {
         {children}
       </main>
 
-      <footer className="bg-card border-t border-border py-16 mt-auto">
+      <footer className="bg-card mt-auto" style={{ borderTop: "4px solid var(--piggy-pink)" }}>
+        <div className="py-16">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col items-center mb-12">
             <img src={logoImg} alt="This Little Piggy Serves Food" className="w-20 h-20 rounded-full object-cover border-4 border-primary shadow-lg shadow-primary/30 mb-4" />
@@ -160,6 +161,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="container mx-auto px-6 md:px-12 mt-12 pt-8 border-t border-border text-center text-xs text-muted-foreground flex flex-col md:flex-row items-center justify-between gap-4">
           <p>&copy; {new Date().getFullYear()} This Little Piggy Serves Food LLC. All rights reserved.</p>
           <Link href="/admin" className="hover:text-primary transition-colors">Admin Portal</Link>
+        </div>
         </div>
       </footer>
     </div>

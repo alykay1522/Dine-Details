@@ -110,7 +110,7 @@ export default function Gallery() {
           </p>
         </motion.div>
 
-        {/* Masonry Grid */}
+        {/* Masonry Grid — 3-col desktop, 2-col tablet, 1-col mobile */}
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
           {GALLERY.map((photo, index) => (
             <motion.div
@@ -119,7 +119,8 @@ export default function Gallery() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
-              className="break-inside-avoid cursor-pointer group relative overflow-hidden rounded-2xl border border-border hover:border-primary/60 transition-colors shadow-md shadow-black/40"
+              className="gallery-card break-inside-avoid cursor-pointer group relative overflow-hidden rounded-lg shadow-md shadow-black/60 transition-all duration-300"
+              style={{ borderRadius: "8px" }}
               onClick={() => openLightbox(index)}
             >
               <img
@@ -129,11 +130,9 @@ export default function Gallery() {
                 loading="lazy"
               />
               {/* Caption overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pointer-events-none">
-                <p className="text-white p-4 font-serif text-base font-semibold">{photo.caption}</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end pointer-events-none">
+                <p className="text-white p-4 font-serif text-base font-semibold drop-shadow-lg">{photo.caption}</p>
               </div>
-              {/* Pink corner accent */}
-              <div className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shadow-primary/50" />
             </motion.div>
           ))}
         </div>

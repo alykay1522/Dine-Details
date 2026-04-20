@@ -57,12 +57,15 @@ export default function Home() {
               </span>
             </motion.div>
 
-            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-6 leading-tight font-bold">
+            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-4 leading-tight font-bold">
               <span className="text-primary">This Little Piggy</span><br/>
               <span className="text-accent italic">Serves Food!</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/85 mb-10 max-w-lg mx-auto md:mx-0 font-light">
-              Family-owned by Tim and Rene Vogler. Started as a food truck, now serving Canyon, TX and surrounding areas with big flavors and even bigger butts!
+            <p className="font-serif text-2xl md:text-3xl font-bold mb-6" style={{ color: "var(--piggy-pink)" }}>
+              Big Flavors. Bigger Butts.
+            </p>
+            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-lg mx-auto md:mx-0 font-light">
+              Family-owned by Tim and Rene Vogler. Started as a food truck, now serving Canyon, TX with the best food in the Panhandle.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <Link href="/menu">
@@ -183,8 +186,8 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex gap-4 items-start bg-card rounded-2xl p-5 border border-border">
-                  <div className="p-3 bg-primary/20 text-primary rounded-xl shrink-0">
+                <div className="flex gap-4 items-start bg-card rounded-lg p-5 border border-border">
+                  <div className="p-3 rounded-lg shrink-0" style={{ background: "rgba(255,229,92,0.15)", color: "var(--piggy-yellow)" }}>
                     <Clock size={22} />
                   </div>
                   <div>
@@ -197,8 +200,8 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <div className="flex gap-4 items-start bg-card rounded-2xl p-5 border border-border">
-                  <div className="p-3 bg-primary/20 text-primary rounded-xl shrink-0">
+                <div className="flex gap-4 items-start bg-card rounded-lg p-5 border border-border">
+                  <div className="p-3 rounded-lg shrink-0" style={{ background: "rgba(255,229,92,0.15)", color: "var(--piggy-yellow)" }}>
                     <MapPin size={22} />
                   </div>
                   <div>
@@ -207,7 +210,7 @@ export default function Home() {
                       19501 Chaparral Road<br/>
                       Canyon, TX 79015
                     </p>
-                    <a href="tel:+18063403895" className="text-primary hover:text-primary/80 transition-colors flex items-center gap-1 mt-2 text-sm font-semibold">
+                    <a href="tel:+18063403895" className="flex items-center gap-1 mt-2 text-sm font-semibold transition-opacity hover:opacity-80" style={{ color: "var(--piggy-yellow)" }}>
                       <Phone size={13} /> (806) 340-3895
                     </a>
                   </div>
@@ -219,26 +222,31 @@ export default function Home() {
       </section>
 
       {/* Specials Preview */}
-      <section className="py-24 bg-card/50 border-t border-border">
+      <section className="py-24 bg-background border-t border-border">
         <div className="container mx-auto px-6 md:px-12">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
-              <h2 className="font-serif text-4xl md:text-5xl font-bold text-foreground mb-3">
-                Today's <span className="text-primary">Specials</span>
+              <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3" style={{ color: "var(--piggy-yellow)" }}>
+                Today's Specials
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl">
                 Fresh from the kitchen, prepared just for today.
               </p>
             </div>
-            <Link href="/specials" className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all shrink-0">
-              View all specials <ArrowRight size={18} />
+            <Link href="/specials">
+              <button
+                className="flex items-center gap-2 font-bold px-5 py-2.5 rounded-lg text-sm transition-all hover:opacity-90 shrink-0"
+                style={{ background: "var(--piggy-purple)", color: "#fff" }}
+              >
+                See All Specials <ArrowRight size={16} />
+              </button>
             </Link>
           </div>
 
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[1, 2, 3].map(i => (
-                <div key={i} className="animate-pulse bg-muted rounded-2xl h-48" />
+                <div key={i} className="animate-pulse bg-muted rounded-lg h-48" />
               ))}
             </div>
           ) : specials && specials.length > 0 ? (
@@ -250,7 +258,14 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="group bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-colors"
+                  className="group bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+                  style={{
+                    borderRadius: "8px",
+                    border: "1.5px solid var(--piggy-teal)",
+                    boxShadow: "0 0 0 0 transparent",
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 0 16px rgba(62,214,196,0.25)")}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = "0 0 0 0 transparent")}
                 >
                   {special.imageUrl && (
                     <div className="relative h-48 overflow-hidden">
@@ -263,8 +278,12 @@ export default function Home() {
                   )}
                   <div className="p-6">
                     <div className="flex justify-between items-start gap-4 mb-2">
-                      <h3 className="font-serif text-xl font-bold text-foreground group-hover:text-primary transition-colors">{special.title}</h3>
-                      {special.price && <span className="font-serif text-lg text-accent font-bold shrink-0">${special.price}</span>}
+                      <h3 className="font-serif text-xl font-bold text-foreground">{special.title}</h3>
+                      {special.price && (
+                        <span className="font-serif text-lg font-bold shrink-0" style={{ color: "var(--piggy-yellow)" }}>
+                          ${special.price}
+                        </span>
+                      )}
                     </div>
                     <p className="text-muted-foreground text-sm line-clamp-2">{special.description}</p>
                   </div>
@@ -272,7 +291,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-card rounded-2xl border border-border">
+            <div className="text-center py-16 bg-card rounded-lg" style={{ border: "1.5px solid var(--piggy-teal)" }}>
               <img src={logoImg} alt="" className="w-20 h-20 rounded-full mx-auto mb-4 object-cover border-2 border-primary opacity-60" />
               <p className="text-muted-foreground italic font-serif text-lg">Check back soon for today's specials.</p>
             </div>

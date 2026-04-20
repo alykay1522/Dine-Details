@@ -14,11 +14,15 @@ type MenuCategory = {
   name: string;
   subtitle?: string;
   items: MenuItem[];
+  color?: string;
+  icon?: string;
 };
 
 const MENU: MenuCategory[] = [
   {
     name: "Appetizers",
+    color: "#FF4FA3",
+    icon: "🐷",
     items: [
       { name: "Cheese Curds", price: "$6" },
       { name: "Fried Okra", price: "$6" },
@@ -31,6 +35,8 @@ const MENU: MenuCategory[] = [
   {
     name: "Anytime Omelette",
     subtitle: "3 Egg Omelette served with Toast",
+    color: "#A45CFF",
+    icon: "🍳",
     items: [
       { name: "Cheese Only", price: "$10" },
       { name: "Up to Three Items", price: "$12" },
@@ -39,6 +45,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Nachos",
+    color: "#FF8A3D",
+    icon: "🌶️",
     items: [
       { name: "Chips and Salsa", price: "$6" },
       { name: "Queso", price: "$8" },
@@ -47,6 +55,8 @@ const MENU: MenuCategory[] = [
   {
     name: "Quesadilla",
     subtitle: "Chicken, Beef or Cheese",
+    color: "#FF8A3D",
+    icon: "🫓",
     items: [
       { name: "½ Quesadilla", price: "$10" },
       { name: "1 Quesadilla", price: "$15" },
@@ -54,6 +64,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Sides",
+    color: "#FFE55C",
+    icon: "🍟",
     items: [
       { name: "Handcut Fries", price: "$5" },
       { name: "Piggy Fries", price: "$5" },
@@ -62,6 +74,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Wings",
+    color: "#FF8A3D",
+    icon: "🔥",
     items: [
       { name: "6 Wings", price: "$8" },
       { name: "12 Wings", price: "$15", note: "+add a side $3 | +add an appetizer $5" },
@@ -69,6 +83,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Big Baked Potato",
+    color: "#FFE55C",
+    icon: "🥔",
     items: [
       { name: "Butter and Sour Cream", price: "$10" },
       { name: "Bacon, Sour Cream, and Cheese", price: "$12" },
@@ -78,12 +94,16 @@ const MENU: MenuCategory[] = [
   {
     name: "Patty Melt",
     subtitle: "⅓ lb Burger on Rye with Grilled Onion and Swiss Cheese",
+    color: "#3ED6C4",
+    icon: "🥩",
     items: [
       { name: "Patty Melt", price: "$12", note: "+add a side $3 | +add an appetizer $5" },
     ],
   },
   {
     name: "Sandwiches",
+    color: "#3ED6C4",
+    icon: "🥪",
     items: [
       { name: "Club", price: "$12" },
       { name: "Grilled Cheese", price: "$8" },
@@ -95,6 +115,8 @@ const MENU: MenuCategory[] = [
   {
     name: "Burgers",
     subtitle: "½ lb hand-pressed patty",
+    color: "#FF8A3D",
+    icon: "🍔",
     items: [
       { name: "½ lb Burger", price: "$10" },
       { name: "½ lb Burger with Cheese", price: "$11" },
@@ -105,6 +127,8 @@ const MENU: MenuCategory[] = [
   {
     name: '"BaWK BaWK" Sandwiches',
     subtitle: "Grilled or fried",
+    color: "#3ED6C4",
+    icon: "🐔",
     items: [
       { name: "Chicken on a Bun", price: "$10" },
       { name: "Chicken Bacon Ranch with Cheese", price: "$12" },
@@ -113,6 +137,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Big'O Hotdogs",
+    color: "#FF4FA3",
+    icon: "🌭",
     items: [
       { name: "¼ lb All Beef Frank", price: "$6" },
       { name: "¼ lb Beef Frank with Sauerkraut", price: "$6" },
@@ -122,6 +148,8 @@ const MENU: MenuCategory[] = [
   {
     name: "Baskets",
     subtitle: "Served with fries",
+    color: "#FF8A3D",
+    icon: "🍤",
     items: [
       { name: "3 Chicken Strips and Fries", price: "$14" },
       { name: "Popcorn Shrimp and Fries", price: "$14" },
@@ -131,6 +159,8 @@ const MENU: MenuCategory[] = [
   },
   {
     name: "Kids Meal",
+    color: "#FFE55C",
+    icon: "⭐",
     items: [
       { name: "1 Catfish", price: "$6" },
       { name: "Small Burger", price: "$5", note: "+add cheese $1" },
@@ -148,7 +178,7 @@ export default function Menu() {
         <img
           src={logoImg}
           alt=""
-          className="w-[700px] max-w-[90vw] opacity-[0.06] select-none"
+          className="w-[700px] max-w-[90vw] opacity-[0.04] select-none"
           style={{ filter: "saturate(0) brightness(2)" }}
         />
       </div>
@@ -162,9 +192,10 @@ export default function Menu() {
           className="text-center mb-16"
         >
           <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
-            <span className="text-primary">Our</span> <span className="text-accent">Menu</span>
+            <span style={{ color: "var(--piggy-pink)" }}>Our</span>{" "}
+            <span style={{ color: "var(--piggy-yellow)" }}>Menu</span>
           </h1>
-          <div className="h-1 w-24 bg-primary mx-auto mb-6 rounded-full"></div>
+          <div className="h-1 w-24 mx-auto mb-6 rounded-full" style={{ background: "var(--piggy-pink)" }} />
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             19501 Chaparral Rd, Canyon, TX 79015
           </p>
@@ -178,52 +209,75 @@ export default function Menu() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 bg-primary/10 border border-primary/30 rounded-2xl px-6 py-5"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 rounded-lg px-6 py-5 border"
+          style={{ background: "rgba(255,79,163,0.08)", borderColor: "rgba(255,79,163,0.35)" }}
         >
           <p className="font-serif text-lg font-bold text-foreground text-center sm:text-left">
             Ready to order? Give us a call!
           </p>
           <a href="tel:+18063403895">
-            <button className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold px-6 py-3 rounded-full shadow-lg shadow-primary/30 transition-colors text-sm">
+            <button
+              className="flex items-center gap-2 font-bold px-6 py-3 rounded-lg shadow-lg transition-all text-sm text-white"
+              style={{ background: "var(--piggy-pink)" }}
+            >
               <Phone size={16} /> (806) 340-3895
             </button>
           </a>
         </motion.div>
 
         {/* Menu Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-14">
-          {MENU.map((category, catIdx) => (
-            <motion.section
-              key={category.name}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
-            >
-              <div className="mb-4 border-b-2 border-primary/30 pb-3">
-                <h2 className="font-serif text-2xl md:text-3xl text-foreground">{category.name}</h2>
-                {category.subtitle && (
-                  <p className="text-muted-foreground text-sm italic mt-1">{category.subtitle}</p>
-                )}
-              </div>
-              <div className="flex flex-col gap-3">
-                {category.items.map((item) => (
-                  <div key={item.name}>
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-medium text-foreground">{item.name}</span>
-                      <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2 shrink"></span>
-                      {item.price && (
-                        <span className="font-serif text-primary font-semibold shrink-0">{item.price}</span>
-                      )}
-                    </div>
-                    {item.note && (
-                      <p className="text-xs text-muted-foreground mt-0.5 italic">{item.note}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+          {MENU.map((category, catIdx) => {
+            const color = category.color ?? "#FF4FA3";
+            return (
+              <motion.section
+                key={category.name}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
+              >
+                {/* Colored section header */}
+                <div
+                  className="mb-4 pb-3 flex items-center gap-2"
+                  style={{ borderBottom: `2px solid ${color}` }}
+                >
+                  {category.icon && (
+                    <span className="text-xl">{category.icon}</span>
+                  )}
+                  <div>
+                    <h2
+                      className="font-serif text-2xl md:text-3xl font-bold"
+                      style={{ color }}
+                    >
+                      {category.name}
+                    </h2>
+                    {category.subtitle && (
+                      <p className="text-muted-foreground text-sm italic mt-0.5">{category.subtitle}</p>
                     )}
                   </div>
-                ))}
-              </div>
-            </motion.section>
-          ))}
+                </div>
+                <div className="flex flex-col gap-3">
+                  {category.items.map((item) => (
+                    <div key={item.name}>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="font-medium text-foreground">{item.name}</span>
+                        <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2 shrink" />
+                        {item.price && (
+                          <span className="font-serif font-semibold shrink-0" style={{ color }}>
+                            {item.price}
+                          </span>
+                        )}
+                      </div>
+                      {item.note && (
+                        <p className="text-xs text-muted-foreground mt-0.5 italic">{item.note}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.section>
+            );
+          })}
         </div>
 
         {/* Pizza Section */}
@@ -234,12 +288,20 @@ export default function Menu() {
           transition={{ duration: 0.5 }}
           className="mt-14"
         >
-          <div className="mb-6 border-b-2 border-primary/30 pb-3">
-            <h2 className="font-serif text-2xl md:text-3xl text-foreground">Pizza</h2>
+          <div
+            className="mb-6 pb-3 flex items-center gap-2"
+            style={{ borderBottom: "2px solid #A45CFF" }}
+          >
+            <span className="text-xl">🍕</span>
+            <h2 className="font-serif text-2xl md:text-3xl font-bold" style={{ color: "#A45CFF" }}>
+              Pizza
+            </h2>
           </div>
           <div className="grid grid-cols-2 gap-8 mb-6">
             <div>
-              <h3 className="font-serif text-xl text-foreground mb-4 underline underline-offset-4 decoration-primary/40">Small – 12"</h3>
+              <h3 className="font-serif text-xl mb-4 underline underline-offset-4" style={{ color: "#A45CFF" }}>
+                Small – 12"
+              </h3>
               <div className="flex flex-col gap-2">
                 {[
                   { name: "Cheese", price: "$12" },
@@ -249,14 +311,16 @@ export default function Menu() {
                 ].map(item => (
                   <div key={item.name} className="flex items-baseline justify-between gap-3">
                     <span className="font-medium text-foreground">{item.name}</span>
-                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2"></span>
-                    <span className="font-serif text-primary font-semibold shrink-0">{item.price}</span>
+                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2" />
+                    <span className="font-serif font-semibold shrink-0" style={{ color: "#A45CFF" }}>{item.price}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <h3 className="font-serif text-xl text-foreground mb-4 underline underline-offset-4 decoration-primary/40">Large – 16"</h3>
+              <h3 className="font-serif text-xl mb-4 underline underline-offset-4" style={{ color: "#A45CFF" }}>
+                Large – 16"
+              </h3>
               <div className="flex flex-col gap-2">
                 {[
                   { name: "Cheese", price: "$14" },
@@ -266,14 +330,14 @@ export default function Menu() {
                 ].map(item => (
                   <div key={item.name} className="flex items-baseline justify-between gap-3">
                     <span className="font-medium text-foreground">{item.name}</span>
-                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2"></span>
-                    <span className="font-serif text-primary font-semibold shrink-0">{item.price}</span>
+                    <span className="flex-1 border-b border-dotted border-border relative -top-1.5 mx-2" />
+                    <span className="font-serif font-semibold shrink-0" style={{ color: "#A45CFF" }}>{item.price}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          <div className="bg-muted/40 rounded-xl p-6 border border-border">
+          <div className="rounded-lg p-6 border border-border" style={{ background: "rgba(164,92,255,0.06)" }}>
             <h4 className="font-medium text-foreground mb-3">Toppings</h4>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Pepperoni · Sausage · Hamburger · Ham · Bacon · Olives · Bell Peppers · Onions · Jalapenos · Banana Peppers · Mushrooms · Pickles
