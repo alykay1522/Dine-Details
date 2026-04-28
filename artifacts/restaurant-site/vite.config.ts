@@ -6,7 +6,6 @@ import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
-
 const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig({
@@ -33,6 +32,15 @@ export default defineConfig({
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
       "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      // ── Static shims: redirect workspace packages to local stubs ──
+      "@workspace/api-client-react": path.resolve(
+        import.meta.dirname,
+        "src/shims/api-client-react.ts",
+      ),
+      "@workspace/object-storage-web": path.resolve(
+        import.meta.dirname,
+        "src/shims/object-storage-web.ts",
+      ),
     },
     dedupe: ["react", "react-dom"],
   },
