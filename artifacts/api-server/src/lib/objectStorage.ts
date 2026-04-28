@@ -1,5 +1,6 @@
 import { Storage, File } from "@google-cloud/storage";
-import { Readable } from "stream";
+import { Readable, PassThrough, pipeline } from "stream";
+import { promisify } from "util";
 import { randomUUID } from "crypto";
 import {
   ObjectAclPolicy,
@@ -8,6 +9,8 @@ import {
   getObjectAclPolicy,
   setObjectAclPolicy,
 } from "./objectAcl";
+
+const pipelineAsync = promisify(pipeline);
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
@@ -25,7 +28,7 @@ export const objectStorageClient = new Storage({
       },
     },
     universe_domain: "googleapis.com",
-  },
+  } as any,
   projectId: "",
 });
 
@@ -71,33 +74,58 @@ export class ObjectStorageService {
   async searchPublicObject(filePath: string): Promise<File | null> {
     for (const searchPath of this.getPublicObjectSearchPaths()) {
       const fullPath = `${searchPath}/${filePath}`;
-
       const { bucketName, objectName } = parseObjectPath(fullPath);
       const bucket = objectStorageClient.bucket(bucketName);
       const file = bucket.file(objectName);
-
       const [exists] = await file.exists();
       if (exists) {
         return file;
       }
     }
-
     return null;
   }
 
-  async downloadObject(file: File, cacheTtlSec: number = 3600): Promise<Response> {
+  async downloadObject(
+    file: File,
+    cacheTtlSec: number = 3600,
+  ): Promise<Response> {
+    if (typeof Response === "undefined") {
+      throw new Error(
+        "Web Response API is not available in this runtime",
+      );
+    }
+
     const [metadata] = await file.getMetadata();
+
+    // Guard: safely extract contentType from metadata
+    const contentType =
+      metadata && typeof metadata.contentType === "string"
+        ? metadata.contentType
+        : "application/octet-stream";
+
     const aclPolicy = await getObjectAclPolicy(file);
     const isPublic = aclPolicy?.visibility === "public";
 
     const nodeStream = file.createReadStream();
-    const webStream = Readable.toWeb(nodeStream) as ReadableStream;
+    const passThrough = new PassThrough();
+
+    // Use promisified pipeline for robust error handling and automatic
+    // stream cleanup.  If the source stream errors mid-transfer, pipeline
+    // destroys both streams and the error propagates through the
+    // PassThrough into the WHATWG ReadableStream returned to the caller.
+    pipelineAsync(nodeStream, passThrough).catch(() => {
+      // Intentionally swallowed — pipeline already destroyed both
+      // streams, and the error is surfaced to the web-stream consumer.
+    });
+
+    const webStream = Readable.toWeb(passThrough) as ReadableStream;
 
     const headers: Record<string, string> = {
-      "Content-Type": (metadata.contentType as string) || "application/octet-stream",
+      "Content-Type": contentType,
       "Cache-Control": `${isPublic ? "public" : "private"}, max-age=${cacheTtlSec}`,
     };
-    if (metadata.size) {
+
+    if (metadata?.size) {
       headers["Content-Length"] = String(metadata.size);
     }
 
@@ -111,12 +139,9 @@ export class ObjectStorageService {
         "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' tool and set PRIVATE_OBJECT_DIR env var."
       );
     }
-
     const objectId = randomUUID();
     const fullPath = `${privateObjectDir}/uploads/${objectId}`;
-
     const { bucketName, objectName } = parseObjectPath(fullPath);
-
     return signObjectURL({
       bucketName,
       objectName,
@@ -129,12 +154,10 @@ export class ObjectStorageService {
     if (!objectPath.startsWith("/objects/")) {
       throw new ObjectNotFoundError();
     }
-
     const parts = objectPath.slice(1).split("/");
     if (parts.length < 2) {
       throw new ObjectNotFoundError();
     }
-
     const entityId = parts.slice(1).join("/");
     let entityDir = this.getPrivateObjectDir();
     if (!entityDir.endsWith("/")) {
@@ -155,32 +178,27 @@ export class ObjectStorageService {
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
       return rawPath;
     }
-
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
-
     let objectEntityDir = this.getPrivateObjectDir();
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
     }
-
     if (!rawObjectPath.startsWith(objectEntityDir)) {
       return rawObjectPath;
     }
-
     const entityId = rawObjectPath.slice(objectEntityDir.length);
     return `/objects/${entityId}`;
   }
 
   async trySetObjectEntityAclPolicy(
     rawPath: string,
-    aclPolicy: ObjectAclPolicy
+    aclPolicy: ObjectAclPolicy,
   ): Promise<string> {
     const normalizedPath = this.normalizeObjectEntityPath(rawPath);
     if (!normalizedPath.startsWith("/")) {
       return normalizedPath;
     }
-
     const objectFile = await this.getObjectEntityFile(normalizedPath);
     await setObjectAclPolicy(objectFile, aclPolicy);
     return normalizedPath;
@@ -214,14 +232,9 @@ function parseObjectPath(path: string): {
   if (pathParts.length < 3) {
     throw new Error("Invalid path: must contain at least a bucket name");
   }
-
   const bucketName = pathParts[1];
   const objectName = pathParts.slice(2).join("/");
-
-  return {
-    bucketName,
-    objectName,
-  };
+  return { bucketName, objectName };
 }
 
 async function signObjectURL({
@@ -241,7 +254,6 @@ async function signObjectURL({
     method,
     expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
   };
-
   const response = await fetch(
     `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
     {
@@ -251,18 +263,15 @@ async function signObjectURL({
       },
       body: JSON.stringify(request),
       signal: AbortSignal.timeout(30_000),
-    }
+    },
   );
-
   if (!response.ok) {
     throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, make sure you're running on Replit`
+      `Failed to sign object URL, errorcode: ${response.status}, make sure you're running on Replit`,
     );
   }
-
   const { signed_url: signedURL } = (await response.json()) as {
     signed_url: string;
   };
-
   return signedURL;
 }
