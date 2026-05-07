@@ -1,0 +1,11 @@
+{
+  "date": "2025-05-06",
+  "items": [
+    {
+      "name": "Pulled Pork Sandwich",
+      "price": "9.99",
+      "description": "Slow-smoked pork with house BBQ.",
+      "image": "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/v123/special1.jpg"
+    }
+  ]
+}
