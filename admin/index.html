@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Piggy Admin Login</title>
+  <style>
+    body { font-family: Arial; padding: 40px; max-width: 500px; margin: auto; }
+    input, button { width: 100%; padding: 12px; margin-top: 12px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+<h2>Admin Login</h2>
+<input id="password" type="password" placeholder="Enter admin password">
+<button onclick="login()">Login</button>
+
+<script>
+function login() {
+  const pass = document.getElementById('password').value;
+  if (pass === "Piggy2025!#") {
+    localStorage.setItem("piggyAdmin", "true");
+    window.location.href = "/admin/dashboard.html";
+  } else {
+    alert("Incorrect password");
+  }
+}
+</script>
+
+</body>
+</html>
