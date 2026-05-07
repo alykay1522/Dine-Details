@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Piggy Admin Dashboard</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    section { margin-bottom: 40px; }
+    textarea { width: 100%; height: 200px; padding: 10px; }
+    button { padding: 10px 20px; margin-top: 10px; }
+    input { padding: 10px; width: 100%; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h1>Piggy Admin Panel</h1>
+
+<section>
+  <h2>Upload Image</h2>
+  <input type="file" id="imageFile" accept="image/*" capture="environment">
+  <button onclick="uploadImage()">Upload</button>
+  <p id="uploadResult"></p>
+</section>
+
+<section>
+  <h2>Daily Specials</h2>
+  <textarea id="specials"></textarea>
+  <button onclick="save('specials')">Save Specials</button>
+</section>
+
+<section>
+  <h2>Menu</h2>
+  <textarea id="menu"></textarea>
+  <button onclick="save('menu')">Save Menu</button>
+</section>
+
+<section>
+  <h2>Site Settings</h2>
+  <textarea id="site"></textarea>
+  <button onclick="save('site')">Save Site Settings</button>
+</section>
+
+<section>
+  <h2>Gallery</h2>
+  <textarea id="gallery"></textarea>
+  <button onclick="save('gallery')">Save Gallery</button>
+</section>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
