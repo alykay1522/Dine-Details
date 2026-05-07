@@ -1,0 +1,9 @@
+{
+  "hours": "Mon–Sat: 11am–8pm",
+  "banner": {
+    "text": "Smoked fresh daily.",
+    "image": "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/v123/banner.jpg"
+  },
+  "announcement": "Now booking summer events!",
+  "catering": "Email us at info@thislittlepiggyservesfood.com for catering."
+}
