@@ -1,0 +1,15 @@
+{
+  "categories": [
+    {
+      "name": "Sandwiches",
+      "items": [
+        {
+          "name": "Brisket Sandwich",
+          "price": "11.99",
+          "description": "Sliced brisket on toasted bun.",
+          "image": "https://res.cloudinary.com/YOUR_CLOUD_NAME/image/upload/v123/brisket.jpg"
+        }
+      ]
+    }
+  ]
+}
