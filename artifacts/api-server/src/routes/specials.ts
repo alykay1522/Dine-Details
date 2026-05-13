@@ -1,4 +1,6 @@
 import { Router, type IRouter } from "express";
+import { appendFileSync } from "node:fs";
+import path from "node:path";
 import { eq, desc } from "drizzle-orm";
 import { db, specialsTable } from "@workspace/db";
 import {
@@ -130,6 +132,26 @@ router.put("/specials/:id", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Special not found" });
     return;
   }
+
+  // #region agent log
+  try {
+    const logPath = path.join(process.cwd(), "debug-70adc8.log");
+    appendFileSync(
+      logPath,
+      `${JSON.stringify({
+        sessionId: "70adc8",
+        location: "routes/specials.ts:PUT",
+        message: "special row updated",
+        data: { id: special.id, updatedFieldCount: Object.keys(updateValues).length },
+        timestamp: Date.now(),
+        hypothesisId: "H6",
+        runId: "post-fix",
+      })}\n`,
+    );
+  } catch {
+    /* ignore */
+  }
+  // #endregion
 
   res.json(UpdateSpecialResponse.parse(mapSpecial(special)));
 });
