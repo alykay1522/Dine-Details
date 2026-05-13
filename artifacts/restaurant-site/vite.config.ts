@@ -6,14 +6,54 @@ import { appendFileSync } from "node:fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
 /** NDJSON debug log at monorepo root (session 70adc8). Dev-only. */
-function agentDebugSessionLogPlugin(logPath: string): Plugin {
+function agentDebugSession70adc8Plugin(logPath: string): Plugin {
   return {
-    name: "agent-debug-session-log",
+    name: "agent-debug-session-70adc8",
     apply: "serve",
     configureServer(server) {
-      server.middlewares.use((req, _res, next) => {
-        const raw = req.url?.split("?")[0] ?? "";
-        if (raw.startsWith("/api/")) {
+      try {
+        appendFileSync(
+          logPath,
+          `${JSON.stringify({
+            sessionId: "70adc8",
+            location: "vite.config:configureServer",
+            message: "agent debug plugin mounted",
+            data: { logPath },
+            timestamp: Date.now(),
+            hypothesisId: "H0",
+            runId: "post-fix",
+          })}\n`,
+        );
+      } catch (err) {
+        console.error("[agent-debug] startup append failed", logPath, err);
+      }
+
+      server.middlewares.use((req, res, next) => {
+        const url = req.url?.split("?")[0] ?? "";
+
+        if (req.method === "POST" && url === "/__agent-debug-ingest") {
+          const chunks: Buffer[] = [];
+          req.on("data", (chunk: Buffer) => {
+            chunks.push(chunk);
+          });
+          req.on("end", () => {
+            try {
+              const body = Buffer.concat(chunks).toString("utf8").trim();
+              if (body) appendFileSync(logPath, `${body}\n`);
+            } catch (err) {
+              console.error("[agent-debug] ingest append failed", err);
+            }
+            res.statusCode = 204;
+            res.end();
+          });
+          req.on("error", (err) => {
+            console.error("[agent-debug] ingest body read error", err);
+            next(err);
+          });
+          return;
+        }
+
+        if (url.startsWith("/api/")) {
           try {
             appendFileSync(
               logPath,
@@ -21,16 +61,17 @@ function agentDebugSessionLogPlugin(logPath: string): Plugin {
                 sessionId: "70adc8",
                 location: "vite:dev:incoming",
                 message: "incoming request under /api",
-                data: { method: req.method, url: raw },
+                data: { method: req.method, url },
                 timestamp: Date.now(),
                 hypothesisId: "H5",
                 runId: "post-fix",
               })}\n`,
             );
-          } catch {
-            /* ignore */
+          } catch (err) {
+            console.error("[agent-debug] /api log failed", err);
           }
         }
+
         next();
       });
     },
@@ -49,7 +90,7 @@ const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 export default defineConfig({
   base: basePath,
   plugins: [
-    agentDebugSessionLogPlugin(
+    agentDebugSession70adc8Plugin(
       path.resolve(import.meta.dirname, "..", "..", "debug-70adc8.log"),
     ),
     react(),
