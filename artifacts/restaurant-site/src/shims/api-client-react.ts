@@ -6,6 +6,22 @@
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 
+/** No-op: shims do not use HTTP; real client prepends this in `customFetch`. */
+export function setBaseUrl(_url: string | null): void {}
+
+export type AuthTokenGetter = () => Promise<string | null> | string | null;
+
+/** No-op: shims do not send bearer tokens. */
+export function setAuthTokenGetter(_getter: AuthTokenGetter | null): void {}
+
+export class ResponseParseError extends Error {
+  readonly name = "ResponseParseError";
+  constructor(message: string) {
+    super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
 /* ── Specials ── */
 
 export type Special = {
