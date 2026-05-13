@@ -362,6 +362,29 @@ export async function customFetch<T = unknown>(
 
   const response = await fetch(input, { ...init, method, headers });
 
+  // #region agent log
+  try {
+    const u = requestInfo.url;
+    if (u.includes("/api/specials")) {
+      fetch("http://127.0.0.1:7630/ingest/71183431-4a9c-4089-94a2-116cd7d49db1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "70adc8" },
+        body: JSON.stringify({
+          sessionId: "70adc8",
+          location: "custom-fetch.ts:afterFetch",
+          message: "specials API response",
+          data: { method, url: u, ok: response.ok, status: response.status },
+          timestamp: Date.now(),
+          hypothesisId: "H4",
+          runId: "post-fix",
+        }),
+      }).catch(() => {});
+    }
+  } catch {
+    /* ignore */
+  }
+  // #endregion
+
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
     throw new ApiError(response, errorData, requestInfo);

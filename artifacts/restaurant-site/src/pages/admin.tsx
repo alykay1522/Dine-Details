@@ -374,6 +374,26 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const payload = { ...formData, price: formData.price || null, imageUrl: formData.imageUrl || null };
+    // #region agent log
+    fetch("http://127.0.0.1:7630/ingest/71183431-4a9c-4089-94a2-116cd7d49db1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "70adc8" },
+      body: JSON.stringify({
+        sessionId: "70adc8",
+        location: "admin.tsx:SpecialsTab:handleSubmit",
+        message: "special form submit",
+        data: {
+          isEdit: Boolean(editingSpecial),
+          id: editingSpecial?.id,
+          category: payload.category,
+          featuredDate: payload.featuredDate,
+        },
+        timestamp: Date.now(),
+        hypothesisId: "H2",
+        runId: "post-fix",
+      }),
+    }).catch(() => {});
+    // #endregion
     if (editingSpecial) {
       updateSpecial.mutate({ id: editingSpecial.id, data: payload }, {
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); }
