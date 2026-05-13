@@ -76,8 +76,7 @@ export default function Menu() {
                 <motion.section
                   key={category.id}
                   initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
                 >
                   {/* Colored section header */}

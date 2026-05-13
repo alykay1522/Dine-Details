@@ -52,7 +52,21 @@ function agentDebugIngestPlugin(logPath: string): Plugin {
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
-const basePath = process.env.BASE_PATH ?? "/";
+
+/**
+ * `?? "/"` is not enough: `BASE_PATH=""` is common in dashboards and would set Vite `base` to "",
+ * producing relative asset URLs that break on client-routed paths (e.g. /menu) after a full reload.
+ */
+function normalizeViteBase(raw: string | undefined): string {
+  if (raw === undefined) return "/";
+  const t = raw.trim();
+  if (t === "" || t === ".") return "/";
+  if (t === "./") return "./";
+  const abs = t.startsWith("/") ? t : `/${t}`;
+  return abs.endsWith("/") ? abs : `${abs}/`;
+}
+
+const basePath = normalizeViteBase(process.env.BASE_PATH);
 
 /** When true, use local shims so the UI runs with no backend (no real CRUD). Default: real workspace clients. */
 const useApiShims = process.env.VITE_USE_API_SHIMS === "true";

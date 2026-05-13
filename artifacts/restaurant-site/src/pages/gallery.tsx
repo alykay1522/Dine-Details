@@ -124,8 +124,7 @@ export default function Gallery() {
             <motion.div
               key={photo.id}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: (index % 3) * 0.08 }}
               className="gallery-card break-inside-avoid cursor-pointer group relative overflow-hidden rounded-lg shadow-md shadow-black/60 transition-all duration-300"
               style={{ borderRadius: "8px" }}

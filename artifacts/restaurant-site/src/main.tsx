@@ -2,50 +2,41 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { reportAgentDebug } from "./agent-debug";
 
 // #region agent log
-function reportAgentDebug(payload: Record<string, unknown>) {
-  const body = JSON.stringify({
-    sessionId: "70adc8",
-    timestamp: Date.now(),
-    runId: "blank-page",
-    ...payload,
-  });
-  console.error("[debug-70adc8]", body);
-  if (import.meta.env.DEV) {
-    void fetch("/__agent-debug-ingest", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-      keepalive: true,
-    }).catch(() => {});
+/** H1 / H1b: errors that never reach AppErrorBoundary (async, non-React). */
+window.addEventListener("error", (ev) => {
+  const t = ev.target;
+  if (
+    t &&
+    t !== window &&
+    t instanceof HTMLElement &&
+    ("src" in t || "href" in t)
+  ) {
+    return;
   }
-  fetch("http://127.0.0.1:7630/ingest/71183431-4a9c-4089-94a2-116cd7d49db1", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "70adc8" },
-    body,
-  }).catch(() => {});
-}
+  reportAgentDebug({
+    location: "window.error",
+    message: ev.message || "window.error",
+    data: {
+      filename: ev.filename,
+      lineno: ev.lineno,
+      colno: ev.colno,
+      err: ev.error ? String(ev.error) : null,
+    },
+    hypothesisId: "H1",
+  });
+});
 
-if (typeof window !== "undefined") {
-  window.addEventListener("error", (ev) => {
-    reportAgentDebug({
-      location: "window.error",
-      message: String(ev.message),
-      data: { filename: ev.filename, lineno: ev.lineno, colno: ev.colno },
-      hypothesisId: "H3",
-    });
+window.addEventListener("unhandledrejection", (ev) => {
+  reportAgentDebug({
+    location: "unhandledrejection",
+    message: "unhandledrejection",
+    data: { reason: String(ev.reason) },
+    hypothesisId: "H1b",
   });
-  window.addEventListener("unhandledrejection", (ev) => {
-    const r = ev.reason;
-    reportAgentDebug({
-      location: "window.unhandledrejection",
-      message: r instanceof Error ? r.message : String(r),
-      data: r instanceof Error ? { name: r.name } : {},
-      hypothesisId: "H4",
-    });
-  });
-}
+});
 
 class AppErrorBoundary extends Component<
   { children: ReactNode },
@@ -82,8 +73,7 @@ class AppErrorBoundary extends Component<
         >
           <h1 style={{ fontSize: 20, marginBottom: 12 }}>Something went wrong</h1>
           <p style={{ color: "#444", marginBottom: 16 }}>
-            The page crashed. Refresh to try again. If you are on Admin → Specials, try again
-            after this update (invalid category values are now handled).
+            The page crashed. Refresh to try again.
           </p>
           <pre
             style={{

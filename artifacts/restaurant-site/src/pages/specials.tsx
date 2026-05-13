@@ -73,8 +73,7 @@ export default function Specials() {
                 <motion.section
                   key={section.key}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: sIdx * 0.05 }}
                 >
                   {/* Section header */}
@@ -98,8 +97,7 @@ export default function Specials() {
                         <motion.div
                           key={item.id}
                           initial={{ opacity: 0, y: 12 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
+                          animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: i * 0.08 }}
                           className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-colors shadow-md shadow-black/30 group"
                         >

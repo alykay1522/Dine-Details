@@ -11,7 +11,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Catches failed script/CSS loads and sync errors before React (e.g. blank flash). -->
+    <!-- Capture-phase: failed script/link/img (e.g. wrong asset base) — avoid window.onerror / unhandledrejection noise. -->
     <script>
       (function () {
         function banner(msg) {
@@ -30,18 +30,16 @@
             console.error("[boot-error]", msg);
           } catch (e) {}
         }
-        window.addEventListener("error", function (ev) {
-          var t = ev && ev.target;
-          if (t && t !== window && (t.src || t.href)) {
-            banner("Resource failed to load: " + (t.src || t.href));
-          } else if (!t || t === window) {
-            banner((ev && ev.message) || "Unknown error");
-          }
-        });
-        window.addEventListener("unhandledrejection", function (ev) {
-          var r = ev.reason;
-          banner(r && r.stack ? r.stack : r && r.message ? r.message : String(r));
-        });
+        window.addEventListener(
+          "error",
+          function (ev) {
+            var t = ev && ev.target;
+            if (t && t !== window && (t.src || t.href)) {
+              banner("Resource failed to load: " + (t.src || t.href));
+            }
+          },
+          true,
+        );
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
