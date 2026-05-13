@@ -43,7 +43,7 @@ export default function Home() {
             src={logoImg}
             alt=""
             className="w-40 h-40 rounded-full object-cover border-4 border-primary shadow-2xl shadow-primary/40"
-            initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 1, delay: 0.5 }}
           />
@@ -51,13 +51,13 @@ export default function Home() {
         
         <div className="container relative z-10 mx-auto px-6 md:px-12 flex flex-col items-center md:items-start text-center md:text-left">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-2xl"
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={false}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
               className="inline-block mb-6"
@@ -98,7 +98,7 @@ export default function Home() {
 
       {/* Announcement Banner */}
       {announcementActive && <motion.section
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="relative overflow-hidden bg-accent py-10 px-6"
@@ -143,7 +143,7 @@ export default function Home() {
         <div className="container mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={false}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="relative"
@@ -180,7 +180,7 @@ export default function Home() {
             </motion.div>
             
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={false}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               className="flex flex-col gap-10"
@@ -264,7 +264,7 @@ export default function Home() {
               {specials.slice(0, 3).map((special, i) => (
                 <motion.div
                   key={special.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                   className="group bg-card overflow-hidden transition-all duration-300 hover:scale-[1.02]"

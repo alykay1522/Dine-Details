@@ -692,7 +692,7 @@ function GalleryTab({ toast }: { toast: any }) {
             {photos.map(photo => (
               <motion.div
                 key={photo.id}
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={false}
                 animate={{ opacity: 1, scale: 1 }}
                 className="relative group rounded-lg overflow-hidden border border-border aspect-square"
               >

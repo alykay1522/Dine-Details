@@ -21,7 +21,7 @@ export default function Menu() {
       <div className="container relative z-10 mx-auto px-6 md:px-12 max-w-5xl">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
@@ -41,7 +41,7 @@ export default function Menu() {
 
         {/* Call to Order Banner */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14 rounded-lg px-6 py-5 border"
@@ -75,7 +75,7 @@ export default function Menu() {
               return (
                 <motion.section
                   key={category.id}
-                  initial={{ opacity: 0, y: 16 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: (catIdx % 2) * 0.1 }}
                 >

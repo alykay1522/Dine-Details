@@ -43,7 +43,7 @@ export default function Specials() {
 
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
@@ -72,7 +72,7 @@ export default function Specials() {
               return (
                 <motion.section
                   key={section.key}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: sIdx * 0.05 }}
                 >
@@ -96,7 +96,7 @@ export default function Specials() {
                       {items.map((item, i) => (
                         <motion.div
                           key={item.id}
-                          initial={{ opacity: 0, y: 12 }}
+                          initial={false}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: i * 0.08 }}
                           className="bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 transition-colors shadow-md shadow-black/30 group"

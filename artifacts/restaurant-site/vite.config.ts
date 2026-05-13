@@ -21,13 +21,34 @@ function agentDebugIngestPlugin(logPath: string): Plugin {
             message: "dev server configureServer ran",
             hypothesisId: "H0",
             runId: "boot",
+            data: { logPath },
           })}\n`,
         );
+        console.info("[agent-debug-ingest] NDJSON log file:", logPath);
       } catch (err) {
         console.warn("[agent-debug-ingest] could not write startup line:", logPath, err);
       }
       server.middlewares.use((req, res, next) => {
         const url = req.url?.split("?")[0] ?? "";
+        const fullUrl = req.url ?? "";
+
+        if (req.method === "GET" && url === "/__agent-debug-beacon") {
+          try {
+            const qs = new URL(fullUrl, "http://vite.local").searchParams;
+            const p = qs.get("p");
+            if (p) {
+              const line = decodeURIComponent(p);
+              JSON.parse(line);
+              appendFileSync(logPath, `${line}\n`);
+            }
+          } catch (err) {
+            console.warn("[agent-debug-beacon] invalid payload:", err);
+          }
+          res.statusCode = 204;
+          res.end();
+          return;
+        }
+
         if (req.method !== "POST" || url !== "/__agent-debug-ingest") {
           next();
           return;
