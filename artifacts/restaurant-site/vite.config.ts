@@ -1,8 +1,39 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { appendFileSync } from "node:fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+/** Dev-only: browser POSTs NDJSON here so the workspace `debug-70adc8.log` file is populated. */
+function agentDebugIngestPlugin(logPath: string): Plugin {
+  return {
+    name: "agent-debug-ingest-70adc8",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url?.split("?")[0] ?? "";
+        if (req.method !== "POST" || url !== "/__agent-debug-ingest") {
+          next();
+          return;
+        }
+        const chunks: Buffer[] = [];
+        req.on("data", (c: Buffer) => chunks.push(c));
+        req.on("end", () => {
+          try {
+            const body = Buffer.concat(chunks).toString("utf8").trim();
+            if (body) appendFileSync(logPath, `${body}\n`);
+          } catch {
+            /* ignore */
+          }
+          res.statusCode = 204;
+          res.end();
+        });
+        req.on("error", next);
+      });
+    },
+  };
+}
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
@@ -13,12 +44,20 @@ const useApiShims = process.env.VITE_USE_API_SHIMS === "true";
 
 const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 
+const agentDebugLogPath = path.resolve(
+  import.meta.dirname,
+  "..",
+  "..",
+  "debug-70adc8.log",
+);
+
 export default defineConfig({
   base: basePath,
   plugins: [
+    agentDebugIngestPlugin(agentDebugLogPath),
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
+    ...(process.env.REPL_ID !== undefined ? [runtimeErrorOverlay()] : []),
     ...(process.env.NODE_ENV !== "production" &&
     process.env.REPL_ID !== undefined
       ? [

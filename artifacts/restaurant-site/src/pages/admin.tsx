@@ -336,6 +336,15 @@ function MenuTab({ toast }: { toast: any }) {
   );
 }
 
+/** Radix Select throws if `value` is not one of the SelectItem values; API allows `weekly` and unknown strings. */
+const SPECIAL_FORM_CATEGORIES = ["daily", "weekly", "soup", "salad", "dessert"] as const;
+
+function normalizeSpecialFormCategory(raw: string): (typeof SPECIAL_FORM_CATEGORIES)[number] {
+  return SPECIAL_FORM_CATEGORIES.includes(raw as (typeof SPECIAL_FORM_CATEGORIES)[number])
+    ? (raw as (typeof SPECIAL_FORM_CATEGORIES)[number])
+    : "daily";
+}
+
 function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
   const { data: specials, isLoading } = useListSpecials();
   const queryClient = useQueryClient();
@@ -368,13 +377,26 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
 
   const handleOpenEdit = (special: any) => {
     setEditingSpecial(special);
-    setFormData({ title: special.title, description: special.description, price: special.price || "", imageUrl: special.imageUrl || "", category: special.category, isActive: special.isActive, featuredDate: special.featuredDate });
+    setFormData({
+      title: special.title,
+      description: special.description,
+      price: special.price || "",
+      imageUrl: special.imageUrl || "",
+      category: normalizeSpecialFormCategory(String(special.category ?? "daily")),
+      isActive: special.isActive,
+      featuredDate: special.featuredDate,
+    });
     setIsDialogOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...formData, price: formData.price || null, imageUrl: formData.imageUrl || null };
+    const payload = {
+      ...formData,
+      category: normalizeSpecialFormCategory(formData.category),
+      price: formData.price || null,
+      imageUrl: formData.imageUrl || null,
+    };
     if (editingSpecial) {
       updateSpecial.mutate({ id: editingSpecial.id, data: payload }, {
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); },
@@ -448,10 +470,14 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
                     </div>
                     <div className="flex flex-col gap-2">
                       <Label>Category</Label>
-                      <Select value={formData.category} onValueChange={(val) => setFormData({...formData, category: val})}>
+                      <Select
+                        value={normalizeSpecialFormCategory(formData.category)}
+                        onValueChange={(val) => setFormData({ ...formData, category: val })}
+                      >
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="daily">Daily Special</SelectItem>
+                          <SelectItem value="weekly">Weekly feature</SelectItem>
                           <SelectItem value="soup">Soup</SelectItem>
                           <SelectItem value="salad">Salad</SelectItem>
                           <SelectItem value="dessert">Dessert</SelectItem>
@@ -499,7 +525,7 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
                     <div className="flex items-center gap-3 mb-1">
                       <h3 className="font-medium text-lg">{s.title}</h3>
                       <span className="text-xs uppercase tracking-wider px-2 py-0.5 bg-muted text-muted-foreground rounded-full">
-                        {{ daily: "Daily", soup: "Soup", salad: "Salad", dessert: "Dessert" }[s.category] ?? s.category}
+                        {{ daily: "Daily", weekly: "Weekly", soup: "Soup", salad: "Salad", dessert: "Dessert" }[s.category] ?? s.category}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-1">{s.description}</p>
