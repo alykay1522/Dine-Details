@@ -1,8 +1,41 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { appendFileSync } from "node:fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+
+/** NDJSON debug log at monorepo root (session 70adc8). Dev-only. */
+function agentDebugSessionLogPlugin(logPath: string): Plugin {
+  return {
+    name: "agent-debug-session-log",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use((req, _res, next) => {
+        const raw = req.url?.split("?")[0] ?? "";
+        if (raw.startsWith("/api/")) {
+          try {
+            appendFileSync(
+              logPath,
+              `${JSON.stringify({
+                sessionId: "70adc8",
+                location: "vite:dev:incoming",
+                message: "incoming request under /api",
+                data: { method: req.method, url: raw },
+                timestamp: Date.now(),
+                hypothesisId: "H5",
+                runId: "post-fix",
+              })}\n`,
+            );
+          } catch {
+            /* ignore */
+          }
+        }
+        next();
+      });
+    },
+  };
+}
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
@@ -16,6 +49,9 @@ const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 export default defineConfig({
   base: basePath,
   plugins: [
+    agentDebugSessionLogPlugin(
+      path.resolve(import.meta.dirname, "..", "..", "debug-70adc8.log"),
+    ),
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),

@@ -51,24 +51,8 @@ export function useCreateSpecial() {
 
 export function useUpdateSpecial() {
   return useMutation({
-    mutationFn: (vars: { id: number; data: Partial<Special> }) => {
-      // #region agent log
-      fetch("http://127.0.0.1:7630/ingest/71183431-4a9c-4089-94a2-116cd7d49db1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "70adc8" },
-        body: JSON.stringify({
-          sessionId: "70adc8",
-          location: "shims/api-client-react.ts:useUpdateSpecial",
-          message: "shim updateSpecial mutationFn (no HTTP)",
-          data: { id: vars?.id, dataKeys: vars?.data ? Object.keys(vars.data) : [] },
-          timestamp: Date.now(),
-          hypothesisId: "H1",
-          runId: "pre-fix",
-        }),
-      }).catch(() => {});
-      // #endregion
-      return Promise.resolve({} as Special);
-    },
+    mutationFn: (_vars: { id: number; data: Partial<Special> }) =>
+      Promise.resolve({} as Special),
   });
 }
 
