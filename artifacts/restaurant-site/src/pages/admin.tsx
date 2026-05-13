@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import {
   useListSpecials, useCreateSpecial, useUpdateSpecial, useDeleteSpecial, getListSpecialsQueryKey,
   useListGallery, useCreateGalleryPhoto, useDeleteGalleryPhoto, getListGalleryQueryKey,
+  ApiError,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -376,25 +377,41 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
     const payload = { ...formData, price: formData.price || null, imageUrl: formData.imageUrl || null };
     if (editingSpecial) {
       updateSpecial.mutate({ id: editingSpecial.id, data: payload }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); }
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); },
+        onError: (err) => {
+          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
+          toast({ title: "Could not update special", description, variant: "destructive" });
+        },
       });
     } else {
       createSpecial.mutate({ data: payload }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special created!" }); setIsDialogOpen(false); }
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special created!" }); setIsDialogOpen(false); },
+        onError: (err) => {
+          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
+          toast({ title: "Could not create special", description, variant: "destructive" });
+        },
       });
     }
   };
 
   const handleToggleActive = (special: any) => {
     updateSpecial.mutate({ id: special.id, data: { isActive: !special.isActive } }, {
-      onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: `Special marked ${!special.isActive ? "active" : "inactive"}` }); }
+      onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: `Special marked ${!special.isActive ? "active" : "inactive"}` }); },
+      onError: (err) => {
+        const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
+        toast({ title: "Could not update special", description, variant: "destructive" });
+      },
     });
   };
 
   const handleDelete = (id: number) => {
     if (confirm("Delete this special?")) {
       deleteSpecial.mutate({ id }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special deleted" }); }
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special deleted" }); },
+        onError: (err) => {
+          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
+          toast({ title: "Could not delete special", description, variant: "destructive" });
+        },
       });
     }
   };
