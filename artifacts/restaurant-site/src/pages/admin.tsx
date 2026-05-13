@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Settings, UtensilsCrossed, Download, BookOpen, ChevronDown, ChevronRight, Palette } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
+import { ensureArray } from "@/lib/utils";
 import { useUpload } from "@workspace/object-storage-web";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
 import {
@@ -156,7 +157,8 @@ const COLOR_OPTIONS = [
 ];
 
 function MenuTab({ toast }: { toast: any }) {
-  const { data: menu, isLoading } = useMenu();
+  const { data: menuRaw, isLoading } = useMenu();
+  const menu = ensureArray<MenuCategoryData>(menuRaw);
   const createCat = useCreateCategory();
   const updateCat = useUpdateCategory();
   const deleteCat = useDeleteCategory();
@@ -178,7 +180,7 @@ function MenuTab({ toast }: { toast: any }) {
       await updateCat.mutateAsync({ id: catDialog.editing.id, ...catForm, sortOrder: catDialog.editing.sortOrder });
       toast({ title: "Category updated!" });
     } else {
-      const sortOrder = (menu?.length ?? 0);
+      const sortOrder = menu.length;
       await createCat.mutateAsync({ ...catForm, sortOrder });
       toast({ title: "Category added!" });
     }
@@ -196,8 +198,8 @@ function MenuTab({ toast }: { toast: any }) {
       await updateItem.mutateAsync({ id: itemDialog.editing.id, ...itemForm });
       toast({ title: "Item updated!" });
     } else {
-      const cat = menu?.find(c => c.id === itemDialog.categoryId);
-      await createItem.mutateAsync({ categoryId: itemDialog.categoryId, ...itemForm, sortOrder: cat?.items.length ?? 0 });
+      const cat = menu.find(c => c.id === itemDialog.categoryId);
+      await createItem.mutateAsync({ categoryId: itemDialog.categoryId, ...itemForm, sortOrder: ensureArray(cat?.items).length });
       toast({ title: "Item added!" });
     }
     setItemDialog({ open: false, categoryId: 0, editing: null });
@@ -217,7 +219,7 @@ function MenuTab({ toast }: { toast: any }) {
 
       {isLoading && <div className="flex justify-center py-12"><Loader2 size={32} className="animate-spin text-primary" /></div>}
 
-      {menu?.map(cat => (
+      {menu.map(cat => (
         <div key={cat.id} className="rounded-lg border border-border overflow-hidden">
           {/* Category header */}
           <div
@@ -231,7 +233,7 @@ function MenuTab({ toast }: { toast: any }) {
                 <span className="font-serif font-bold text-foreground text-base">{cat.name}</span>
                 {cat.subtitle && <span className="text-muted-foreground text-xs ml-2 italic">{cat.subtitle}</span>}
               </div>
-              <span className="text-xs text-muted-foreground ml-1 shrink-0">({cat.items.length} items)</span>
+              <span className="text-xs text-muted-foreground ml-1 shrink-0">({ensureArray(cat.items).length} items)</span>
             </div>
             <div className="flex items-center gap-1 shrink-0 ml-2">
               <button onClick={e => { e.stopPropagation(); openEditCat(cat); }} className="p-1.5 rounded hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"><Edit2 size={14} /></button>
@@ -243,7 +245,7 @@ function MenuTab({ toast }: { toast: any }) {
           {/* Items list */}
           {expandedCats.has(cat.id) && (
             <div className="bg-card divide-y divide-border">
-              {cat.items.map(item => (
+              {ensureArray<MenuItemData>(cat.items).map(item => (
                 <div key={item.id} className="flex items-center justify-between px-5 py-3 gap-3">
                   <div className="flex-1 min-w-0">
                     <span className="font-medium text-foreground text-sm">{item.name}</span>
@@ -346,7 +348,8 @@ function normalizeSpecialFormCategory(raw: string): (typeof SPECIAL_FORM_CATEGOR
 }
 
 function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
-  const { data: specials, isLoading } = useListSpecials();
+  const { data: specialsRaw, isLoading } = useListSpecials();
+  const specials = ensureArray(specialsRaw);
   const queryClient = useQueryClient();
   const createSpecial = useCreateSpecial();
   const updateSpecial = useUpdateSpecial();
@@ -517,7 +520,7 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
 
           {isLoading ? (
             <div className="space-y-4">{[1,2,3].map(i => <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />)}</div>
-          ) : specials && specials.length > 0 ? (
+          ) : specials.length > 0 ? (
             <div className="space-y-4">
               {specials.map(s => (
                 <div key={s.id} className={`flex items-center justify-between p-4 rounded-lg border ${s.isActive ? "border-border bg-background" : "border-muted bg-muted/50 opacity-70"}`}>
@@ -597,7 +600,8 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
 /* ─── GALLERY TAB ─── */
 function GalleryTab({ toast }: { toast: any }) {
   const queryClient = useQueryClient();
-  const { data: photos, isLoading } = useListGallery();
+  const { data: photosRaw, isLoading } = useListGallery();
+  const photos = ensureArray(photosRaw);
   const createPhoto = useCreateGalleryPhoto();
   const deletePhoto = useDeleteGalleryPhoto();
 
@@ -687,7 +691,7 @@ function GalleryTab({ toast }: { toast: any }) {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {[1,2,3,4].map(i => <div key={i} className="aspect-square bg-muted animate-pulse rounded-lg" />)}
           </div>
-        ) : photos && photos.length > 0 ? (
+        ) : photos.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {photos.map(photo => (
               <motion.div

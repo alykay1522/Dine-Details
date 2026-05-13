@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useListSpecials } from "@workspace/api-client-react";
+import { ensureArray } from "@/lib/utils";
 import { Utensils, Soup, Salad, IceCream } from "lucide-react";
 
 const SECTIONS = [
@@ -34,8 +35,8 @@ const SECTIONS = [
 ];
 
 export default function Specials() {
-  const { data: specials, isLoading } = useListSpecials();
-  const activeSpecials = specials?.filter(s => s.isActive) || [];
+  const { data: specialsRaw, isLoading } = useListSpecials();
+  const activeSpecials = ensureArray(specialsRaw).filter(s => s.isActive);
 
   return (
     <div className="min-h-screen bg-background pt-12 pb-24">

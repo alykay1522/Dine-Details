@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useListGallery } from "@workspace/api-client-react";
+import { ensureArray } from "@/lib/utils";
 
 import img1 from "@assets/1000017237_1776656424748.jpg";
 import img2 from "@assets/1000017238_1776656424749.jpg";
@@ -75,7 +76,7 @@ export default function Gallery() {
 
   const allPhotos = useMemo(() => {
     const staticPhotos = GALLERY.map(p => ({ id: `static-${p.id}`, src: p.src as string, caption: p.caption }));
-    const uploaded = (dbPhotos ?? []).map(p => ({ id: `db-${p.id}`, src: p.imageUrl, caption: p.caption ?? "" }));
+    const uploaded = ensureArray(dbPhotos).map(p => ({ id: `db-${p.id}`, src: p.imageUrl, caption: p.caption ?? "" }));
     return [...uploaded, ...staticPhotos];
   }, [dbPhotos]);
 

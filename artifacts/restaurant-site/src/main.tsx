@@ -1,42 +1,7 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { reportAgentDebug } from "./agent-debug";
-
-// #region agent log
-/** H1 / H1b: errors that never reach AppErrorBoundary (async, non-React). */
-window.addEventListener("error", (ev) => {
-  const t = ev.target;
-  if (
-    t &&
-    t !== window &&
-    t instanceof HTMLElement &&
-    ("src" in t || "href" in t)
-  ) {
-    return;
-  }
-  reportAgentDebug({
-    location: "window.error",
-    message: ev.message || "window.error",
-    data: {
-      filename: ev.filename,
-      lineno: ev.lineno,
-      colno: ev.colno,
-      err: ev.error ? String(ev.error) : null,
-    },
-    hypothesisId: "H1",
-  });
-});
-
-window.addEventListener("unhandledrejection", (ev) => {
-  reportAgentDebug({
-    location: "unhandledrejection",
-    message: "unhandledrejection",
-    data: { reason: String(ev.reason) },
-    hypothesisId: "H1b",
-  });
-});
 
 class AppErrorBoundary extends Component<
   { children: ReactNode },
@@ -46,18 +11,6 @@ class AppErrorBoundary extends Component<
 
   static getDerivedStateFromError(error: Error) {
     return { error };
-  }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    reportAgentDebug({
-      location: "AppErrorBoundary:componentDidCatch",
-      message: error.message,
-      data: {
-        name: error.name,
-        componentStack: info.componentStack?.slice(0, 1200),
-      },
-      hypothesisId: "H1",
-    });
   }
 
   render() {
@@ -92,7 +45,6 @@ class AppErrorBoundary extends Component<
     return this.props.children;
   }
 }
-// #endregion
 
 const rootEl = document.getElementById("root");
 if (!rootEl) {

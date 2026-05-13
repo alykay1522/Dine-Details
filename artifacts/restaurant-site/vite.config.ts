@@ -1,75 +1,8 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import { appendFileSync } from "node:fs";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-
-/** Dev-only: browser POSTs NDJSON here so the workspace `debug-70adc8.log` file is populated. */
-function agentDebugIngestPlugin(logPath: string): Plugin {
-  return {
-    name: "agent-debug-ingest-70adc8",
-    apply: "serve",
-    configureServer(server) {
-      try {
-        appendFileSync(
-          logPath,
-          `${JSON.stringify({
-            sessionId: "70adc8",
-            timestamp: Date.now(),
-            location: "vite:configureServer",
-            message: "dev server configureServer ran",
-            hypothesisId: "H0",
-            runId: "boot",
-            data: { logPath },
-          })}\n`,
-        );
-        console.info("[agent-debug-ingest] NDJSON log file:", logPath);
-      } catch (err) {
-        console.warn("[agent-debug-ingest] could not write startup line:", logPath, err);
-      }
-      server.middlewares.use((req, res, next) => {
-        const url = req.url?.split("?")[0] ?? "";
-        const fullUrl = req.url ?? "";
-
-        if (req.method === "GET" && url === "/__agent-debug-beacon") {
-          try {
-            const qs = new URL(fullUrl, "http://vite.local").searchParams;
-            const p = qs.get("p");
-            if (p) {
-              const line = decodeURIComponent(p);
-              JSON.parse(line);
-              appendFileSync(logPath, `${line}\n`);
-            }
-          } catch (err) {
-            console.warn("[agent-debug-beacon] invalid payload:", err);
-          }
-          res.statusCode = 204;
-          res.end();
-          return;
-        }
-
-        if (req.method !== "POST" || url !== "/__agent-debug-ingest") {
-          next();
-          return;
-        }
-        const chunks: Buffer[] = [];
-        req.on("data", (c: Buffer) => chunks.push(c));
-        req.on("end", () => {
-          try {
-            const body = Buffer.concat(chunks).toString("utf8").trim();
-            if (body) appendFileSync(logPath, `${body}\n`);
-          } catch (err) {
-            console.warn("[agent-debug-ingest] append failed:", logPath, err);
-          }
-          res.statusCode = 204;
-          res.end();
-        });
-        req.on("error", next);
-      });
-    },
-  };
-}
 
 const rawPort = process.env.PORT;
 const port = rawPort ? Number(rawPort) : 3000;
@@ -94,17 +27,9 @@ const useApiShims = process.env.VITE_USE_API_SHIMS === "true";
 
 const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 
-const agentDebugLogPath = path.resolve(
-  import.meta.dirname,
-  "..",
-  "..",
-  "debug-70adc8.log",
-);
-
 export default defineConfig({
   base: basePath,
   plugins: [
-    agentDebugIngestPlugin(agentDebugLogPath),
     react(),
     tailwindcss(),
     ...(process.env.REPL_ID !== undefined ? [runtimeErrorOverlay()] : []),

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useGetCurrentSpecials } from "@workspace/api-client-react";
+import { ensureArray } from "@/lib/utils";
 import { ArrowRight, MapPin, Clock, Phone } from "lucide-react";
 import heroImg from "@/assets/images/hero.png";
 import msPiggyImg from "@assets/msPiggy_1776656228023.jpg";
@@ -12,7 +13,8 @@ import jerkeyImg from "@assets/1000017238_1776656424749.jpg";
 import { useSettings } from "@/hooks/use-settings";
 
 export default function Home() {
-  const { data: specials, isLoading } = useGetCurrentSpecials();
+  const { data: specialsRaw, isLoading } = useGetCurrentSpecials();
+  const specials = ensureArray(specialsRaw);
   const { data: settings } = useSettings();
 
   const announcementActive = settings?.announcement_active !== "false";
@@ -259,7 +261,7 @@ export default function Home() {
                 <div key={i} className="animate-pulse bg-muted rounded-lg h-48" />
               ))}
             </div>
-          ) : specials && specials.length > 0 ? (
+          ) : specials.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {specials.slice(0, 3).map((special, i) => (
                 <motion.div

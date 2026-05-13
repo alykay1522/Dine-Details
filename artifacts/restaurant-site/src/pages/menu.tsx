@@ -2,9 +2,11 @@ import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
 import logoImg from "@assets/LOGOfront_1776656215137.jpg";
 import { useMenu } from "@/hooks/use-menu";
+import { ensureArray } from "@/lib/utils";
 
 export default function Menu() {
-  const { data: menu, isLoading } = useMenu();
+  const { data: menuRaw, isLoading } = useMenu();
+  const menu = ensureArray(menuRaw);
 
   return (
     <div className="min-h-screen bg-background pt-12 pb-24 relative overflow-hidden">
@@ -68,7 +70,7 @@ export default function Menu() {
         )}
 
         {/* Menu Grid */}
-        {menu && menu.length > 0 && (
+        {menu.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
             {menu.map((category, catIdx) => {
               const color = category.color ?? "#FF4FA3";
@@ -100,7 +102,7 @@ export default function Menu() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-3">
-                    {category.items.map((item) => (
+                    {ensureArray(category.items).map((item) => (
                       <div key={item.id}>
                         <div className="flex items-baseline justify-between gap-3">
                           <span className="font-medium text-foreground">{item.name}</span>
