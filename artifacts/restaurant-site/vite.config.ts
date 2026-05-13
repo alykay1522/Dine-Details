@@ -22,8 +22,13 @@ function normalizeViteBase(raw: string | undefined): string {
 
 const basePath = normalizeViteBase(process.env.BASE_PATH);
 
-/** When true, use local shims so the UI runs with no backend (no real CRUD). Default: real workspace clients. */
-const useApiShims = process.env.VITE_USE_API_SHIMS === "true";
+/**
+ * Use local shims when explicitly requested, or when no API origin exists in production.
+ * This prevents static deployments from attempting POST/PUT/DELETE to non-existent /api routes.
+ */
+const useApiShims =
+  process.env.VITE_USE_API_SHIMS === "true" ||
+  (!process.env.VITE_API_ORIGIN && process.env.NODE_ENV === "production");
 
 const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 

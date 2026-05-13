@@ -1,7 +1,13 @@
 import { Component, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
+import { setBaseUrl } from "@workspace/api-client-react";
 import App from "./App";
 import "./index.css";
+
+const apiOrigin = import.meta.env.VITE_API_ORIGIN?.trim();
+if (apiOrigin) {
+  setBaseUrl(apiOrigin);
+}
 
 class AppErrorBoundary extends Component<
   { children: ReactNode },
