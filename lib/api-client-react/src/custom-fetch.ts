@@ -376,7 +376,7 @@ export async function customFetch<T = unknown>(
           data: { method, url: u, ok: response.ok, status: response.status },
           timestamp: Date.now(),
           hypothesisId: "H4",
-          runId: "trace",
+          runId: "post-fix",
         }),
       }).catch(() => {});
     }
