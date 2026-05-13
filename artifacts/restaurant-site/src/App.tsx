@@ -35,7 +35,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter
-          base={String(import.meta.env.BASE_URL ?? "/").replace(/\/$/, "")}
+          base={
+            String(import.meta.env.BASE_URL ?? "/").replace(/\/$/, "") || "/"
+          }
         >
           <Router />
         </WouterRouter>

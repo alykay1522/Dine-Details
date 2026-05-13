@@ -11,6 +11,39 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Catches failed script/CSS loads and sync errors before React (e.g. blank flash). -->
+    <script>
+      (function () {
+        function banner(msg) {
+          var box = document.getElementById("__boot_err");
+          if (!box) {
+            box = document.createElement("div");
+            box.id = "__boot_err";
+            box.setAttribute("role", "alert");
+            box.style.cssText =
+              "position:fixed;top:0;left:0;right:0;z-index:2147483647;padding:12px 16px;font:13px/1.4 system-ui,sans-serif;background:#450a0a;color:#fecaca;border-bottom:2px solid #b91c1c;white-space:pre-wrap;max-height:40vh;overflow:auto";
+            document.body.insertBefore(box, document.body.firstChild);
+          }
+          box.textContent =
+            (box.textContent ? box.textContent + "\n\n" : "") + String(msg);
+          try {
+            console.error("[boot-error]", msg);
+          } catch (e) {}
+        }
+        window.addEventListener("error", function (ev) {
+          var t = ev && ev.target;
+          if (t && t !== window && (t.src || t.href)) {
+            banner("Resource failed to load: " + (t.src || t.href));
+          } else if (!t || t === window) {
+            banner((ev && ev.message) || "Unknown error");
+          }
+        });
+        window.addEventListener("unhandledrejection", function (ev) {
+          var r = ev.reason;
+          banner(r && r.stack ? r.stack : r && r.message ? r.message : String(r));
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

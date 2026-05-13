@@ -11,6 +11,21 @@ function agentDebugIngestPlugin(logPath: string): Plugin {
     name: "agent-debug-ingest-70adc8",
     apply: "serve",
     configureServer(server) {
+      try {
+        appendFileSync(
+          logPath,
+          `${JSON.stringify({
+            sessionId: "70adc8",
+            timestamp: Date.now(),
+            location: "vite:configureServer",
+            message: "dev server configureServer ran",
+            hypothesisId: "H0",
+            runId: "boot",
+          })}\n`,
+        );
+      } catch (err) {
+        console.warn("[agent-debug-ingest] could not write startup line:", logPath, err);
+      }
       server.middlewares.use((req, res, next) => {
         const url = req.url?.split("?")[0] ?? "";
         if (req.method !== "POST" || url !== "/__agent-debug-ingest") {
@@ -23,8 +38,8 @@ function agentDebugIngestPlugin(logPath: string): Plugin {
           try {
             const body = Buffer.concat(chunks).toString("utf8").trim();
             if (body) appendFileSync(logPath, `${body}\n`);
-          } catch {
-            /* ignore */
+          } catch (err) {
+            console.warn("[agent-debug-ingest] append failed:", logPath, err);
           }
           res.statusCode = 204;
           res.end();
