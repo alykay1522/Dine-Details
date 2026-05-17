@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { isStaticShimMode } from "@/lib/api-config";
+import { apiFetch } from "@/lib/api-fetch";
 
 export type SiteSettings = {
   hours_weekday: string;
@@ -12,8 +14,6 @@ export type SiteSettings = {
 
 const SETTINGS_KEY = ["settings"] as const;
 
-/* ── Static defaults (extracted from api-server/src/routes/settings.ts) ── */
-
 const STATIC_SETTINGS: SiteSettings = {
   hours_weekday: "Mon–Thu: 11am – 9pm",
   hours_weekend: "Fri–Sat: 11am – 10pm",
@@ -26,22 +26,28 @@ const STATIC_SETTINGS: SiteSettings = {
     "Tim and Rene Vogler started This Little Piggy as a food truck with a simple dream — bring bold, satisfying food to the Texas Panhandle. From wings and burgers to pizza and baked potatoes, every dish is made with love at their restaurant on Chaparral Road in Canyon, TX.",
 };
 
+async function fetchSettings(): Promise<SiteSettings> {
+  return apiFetch<SiteSettings>("/settings");
+}
+
 export function useSettings() {
   return useQuery<SiteSettings>({
     queryKey: [...SETTINGS_KEY],
-    queryFn: () => Promise.resolve(STATIC_SETTINGS),
-    staleTime: Infinity,
-    initialData: STATIC_SETTINGS,
+    queryFn: () =>
+      isStaticShimMode() ? Promise.resolve(STATIC_SETTINGS) : fetchSettings(),
+    initialData: isStaticShimMode() ? STATIC_SETTINGS : undefined,
+    staleTime: isStaticShimMode() ? Infinity : 30_000,
   });
 }
 
 export function useUpdateSettings() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (_updates: Partial<SiteSettings>) => {
-      console.warn("[static-mode] Settings updates are disabled without a backend.");
-      return Promise.reject(new Error("Editing is disabled in static mode."));
-    },
+    mutationFn: (updates: Partial<SiteSettings>) =>
+      apiFetch<SiteSettings>("/settings", {
+        method: "PUT",
+        body: JSON.stringify(updates),
+      }),
     onSuccess: (data) => {
       qc.setQueryData(SETTINGS_KEY, data);
     },

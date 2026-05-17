@@ -120,8 +120,33 @@ async function getFullMenu() {
   }));
 }
 
+/** One-time correction if DB was seeded with outdated appetizer prices. */
+async function ensureAppetizerPrices() {
+  const [appetizers] = await db
+    .select()
+    .from(menuCategoriesTable)
+    .where(eq(menuCategoriesTable.name, "Appetizers"))
+    .limit(1);
+  if (!appetizers) return;
+
+  const items = await db
+    .select()
+    .from(menuItemsTable)
+    .where(eq(menuItemsTable.categoryId, appetizers.id));
+
+  for (const item of items) {
+    if (item.price === "$6") {
+      await db
+        .update(menuItemsTable)
+        .set({ price: "$8" })
+        .where(eq(menuItemsTable.id, item.id));
+    }
+  }
+}
+
 router.get("/menu", async (_req, res): Promise<void> => {
   await seedIfEmpty();
+  await ensureAppetizerPrices();
   res.json(await getFullMenu());
 });
 

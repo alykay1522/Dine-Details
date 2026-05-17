@@ -5,6 +5,7 @@ import galleryRouter from "./gallery";
 import storageRouter from "./storage";
 import settingsRouter from "./settings";
 import menuRouter from "./menu";
+import uploadRouter from "./upload";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(galleryRouter);
 router.use(storageRouter);
 router.use(settingsRouter);
 router.use(menuRouter);
+router.use(uploadRouter);
 
 export default router;
