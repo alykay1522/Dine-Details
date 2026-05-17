@@ -25,9 +25,11 @@ let _authTokenGetter: AuthTokenGetter | null = null;
  * Useful for Expo bundles that need to call a remote API server.
  * Pass `null` to clear the base URL.
  */
+
 export function setBaseUrl(url: string | null): void {
-  _baseUrl = url ? url.replace(/\/+$/, "") : null;
+  _baseUrl = url ? url.split("/").filter(Boolean).join("/") : null;
 }
+
 
 /**
  * Register a getter that supplies a bearer auth token.  Before every fetch
