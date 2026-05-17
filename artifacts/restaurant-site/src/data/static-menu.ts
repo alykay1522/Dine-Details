@@ -65,12 +65,12 @@ const MENU_ITEMS_BY_CATEGORY: Record<
   { name: string; price?: string; note?: string }[]
 > = {
   Appetizers: [
-    { name: "Cheese Curds", price: "$6" },
-    { name: "Fried Okra", price: "$6" },
-    { name: "Zucchini Sticks", price: "$6" },
-    { name: "Jalapeno Bottle Caps", price: "$6" },
-    { name: "Munchers", price: "$6" },
-    { name: "Fried Pickles", price: "$6" },
+    { name: "Cheese Curds", price: "$8" },
+    { name: "Fried Okra", price: "$8" },
+    { name: "Zucchini Sticks", price: "$8" },
+    { name: "Jalapeno Bottle Caps", price: "$8" },
+    { name: "Munchers", price: "$8" },
+    { name: "Fried Pickles", price: "$8" },
   ],
   "Anytime Omelette": [
     { name: "Cheese Only", price: "$10" },

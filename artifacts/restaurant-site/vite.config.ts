@@ -25,13 +25,8 @@ function normalizeViteBase(raw: string | undefined): string {
 
 const basePath = normalizeViteBase(process.env.BASE_PATH);
 
-/**
- * Use local shims when explicitly requested, or when no API origin exists in production.
- * This prevents static deployments from attempting POST/PUT/DELETE to non-existent /api routes.
- */
-const useApiShims =
-  process.env.VITE_USE_API_SHIMS === "true" ||
-  (!process.env.VITE_API_ORIGIN && process.env.NODE_ENV === "production");
+/** Offline UI only — production uses same-origin /api via Vercel serverless. */
+const useApiShims = process.env.VITE_USE_API_SHIMS === "true";
 
 const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
 
