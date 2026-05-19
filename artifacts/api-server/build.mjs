@@ -124,6 +124,7 @@ async function buildAll() {
     outdir: repoApiDir,
     entryNames: "index",
     outExtension: { ".js": ".mjs" },
+    plugins: [],
   });
 }
 
