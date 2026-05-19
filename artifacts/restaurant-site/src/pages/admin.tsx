@@ -18,6 +18,7 @@ import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Se
 import { QRCodeCanvas } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
 import { ensureArray } from "@/lib/utils";
+import { useUpload } from "@workspace/object-storage-web";
 import { uploadGalleryImage } from "@/lib/upload-gallery-image";
 import { DEFAULT_HOURS_LINE } from "@/data/site-hours";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
