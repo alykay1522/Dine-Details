@@ -121,7 +121,8 @@ async function buildAll() {
   await esbuild({
     ...esbuildOptions,
     entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
-    outfile: path.resolve(repoApiDir, "index.mjs"),
+    outdir: repoApiDir,
+    entryNames: "index",
     outExtension: { ".js": ".mjs" },
   });
 }
