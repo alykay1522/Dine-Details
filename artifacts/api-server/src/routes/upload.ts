@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
 
 const router: IRouter = Router();
 const upload = multer({
@@ -8,23 +7,30 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
-function configureCloudinary() {
+async function getConfiguredCloudinary() {
   const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
     process.env;
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    return false;
+    return null;
   }
+
+  if (process.env.CLOUDINARY_URL?.includes("<")) {
+    delete process.env.CLOUDINARY_URL;
+  }
+
+  const { v2: cloudinary } = await import("cloudinary");
   cloudinary.config({
     cloud_name: CLOUDINARY_CLOUD_NAME,
     api_key: CLOUDINARY_API_KEY,
     api_secret: CLOUDINARY_API_SECRET,
   });
-  return true;
+  return cloudinary;
 }
 
 /** Multipart image upload for admin gallery (Vercel / Cloudinary). */
 router.post("/upload-image", upload.single("file"), async (req, res): Promise<void> => {
-  if (!configureCloudinary()) {
+  const cloudinary = await getConfiguredCloudinary();
+  if (!cloudinary) {
     res.status(503).json({
       error:
         "Image upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
