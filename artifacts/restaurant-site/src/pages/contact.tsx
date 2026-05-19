@@ -5,10 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Clock, Instagram, Facebook, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSettings } from "@/hooks/use-settings";
+import { getHoursDisplayLines } from "@/data/site-hours";
 import msPiggyImg from "@assets/msPiggy_1776657247419.jpg";
 
 export default function Contact() {
   const { toast } = useToast();
+  const { data: settings } = useSettings();
+  const hoursLines = getHoursDisplayLines(settings);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -104,9 +108,12 @@ export default function Contact() {
                   <div>
                     <h3 className="font-serif text-xl mb-2">Hours</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Mon-Thu: 11am – 9pm<br/>
-                      Fri-Sat: 11am – 10pm<br/>
-                      Sun: 10am – 8pm
+                      {hoursLines.map((line, i) => (
+                        <span key={line}>
+                          {i > 0 && <br />}
+                          {line}
+                        </span>
+                      ))}
                     </p>
                   </div>
                 </div>

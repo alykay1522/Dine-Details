@@ -1,8 +1,15 @@
 {
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/restaurant-site run build",
+  "buildCommand": "pnpm -C artifacts/api-server build && pnpm -C artifacts/restaurant-site build",
   "outputDirectory": "artifacts/restaurant-site/dist/public",
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
   "rewrites": [
-    { "source": "/:path((?!api/).*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

@@ -4,9 +4,9 @@ import { db, settingsTable } from "@workspace/db";
 const router: IRouter = Router();
 
 const DEFAULTS: Record<string, string> = {
-  hours_weekday: "Mon–Thu: 11am – 9pm",
-  hours_weekend: "Fri–Sat: 11am – 10pm",
-  hours_sunday: "Sun: 10am – 8pm",
+  hours_weekday: "Thursday–Sunday: 11am – 8pm",
+  hours_weekend: "",
+  hours_sunday: "",
   announcement_active: "true",
   announcement_title: "Now Making Homemade Jerky!",
   announcement_body:
@@ -14,6 +14,12 @@ const DEFAULTS: Record<string, string> = {
   story_text:
     "Tim and Rene Vogler started This Little Piggy as a food truck with a simple dream — bring bold, satisfying food to the Texas Panhandle. From wings and burgers to pizza and baked potatoes, every dish is made with love at their restaurant on Chaparral Road in Canyon, TX.",
 };
+
+const LEGACY_HOURS = new Set([
+  "Mon–Thu: 11am – 9pm",
+  "Fri–Sat: 11am – 10pm",
+  "Sun: 10am – 8pm",
+]);
 
 async function ensureDefaults() {
   const existing = await db.select().from(settingsTable);
@@ -23,6 +29,21 @@ async function ensureDefaults() {
     await db.insert(settingsTable).values(
       missing.map(([key, value]) => ({ key, value, updatedAt: new Date() }))
     );
+  }
+
+  const weekday = existing.find((s) => s.key === "hours_weekday");
+  if (weekday && LEGACY_HOURS.has(weekday.value)) {
+    await db
+      .insert(settingsTable)
+      .values({
+        key: "hours_weekday",
+        value: DEFAULTS.hours_weekday,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: settingsTable.key,
+        set: { value: DEFAULTS.hours_weekday, updatedAt: new Date() },
+      });
   }
 }
 

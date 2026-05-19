@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { STATIC_MENU } from "../data/static-menu";
-import { isStaticShimMode } from "@/lib/api-config";
 import { apiFetch } from "@/lib/api-fetch";
+import { useApiQueryWithStaticFallback } from "@/lib/use-api-query";
 
 export type MenuItemData = {
   id: number;
@@ -30,12 +30,10 @@ async function fetchMenu(): Promise<MenuCategoryData[]> {
 }
 
 export function useMenu() {
-  return useQuery<MenuCategoryData[]>({
-    queryKey: [...MENU_KEY],
-    queryFn: () =>
-      isStaticShimMode() ? Promise.resolve(STATIC_MENU) : fetchMenu(),
-    initialData: isStaticShimMode() ? STATIC_MENU : undefined,
-    staleTime: isStaticShimMode() ? Infinity : 30_000,
+  return useApiQueryWithStaticFallback({
+    queryKey: MENU_KEY,
+    staticData: STATIC_MENU,
+    fetchFn: fetchMenu,
   });
 }
 

@@ -11,6 +11,7 @@ import truckFrontImg from "@assets/foodtruckfront_1776656329344.jpg";
 import truckBackImg from "@assets/Foodtruck_1776656329342.jpg";
 import jerkeyImg from "@assets/1000017238_1776656424749.jpg";
 import { useSettings } from "@/hooks/use-settings";
+import { getHoursDisplayLines } from "@/data/site-hours";
 
 export default function Home() {
   const { data: specialsRaw, isLoading } = useGetCurrentSpecials();
@@ -21,9 +22,7 @@ export default function Home() {
   const announcementTitle = settings?.announcement_title ?? "Now Making Homemade Jerky!";
   const announcementBody = settings?.announcement_body ?? "Little Piggy's own handcrafted beef jerky — bold flavor, made right here in Canyon, TX. Call us for details, flavors & ordering!";
   const storyText = settings?.story_text ?? "Tim and Rene Vogler started This Little Piggy as a food truck with a simple dream — bring bold, satisfying food to the Texas Panhandle. From wings and burgers to pizza and baked potatoes, every dish is made with love at their restaurant on Chaparral Road in Canyon, TX.";
-  const hoursWeekday = settings?.hours_weekday ?? "Mon-Thu 11am–9pm";
-  const hoursWeekend = settings?.hours_weekend ?? "Fri-Sat 11am–10pm";
-  const hoursSunday = settings?.hours_sunday ?? "Sun 10am–8pm";
+  const hoursLines = getHoursDisplayLines(settings);
 
   return (
     <div className="flex flex-col w-full">
@@ -204,9 +203,12 @@ export default function Home() {
                   <div>
                     <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Hours</h3>
                     <p className="text-muted-foreground text-sm leading-loose">
-                      {hoursWeekday}<br/>
-                      {hoursWeekend}<br/>
-                      {hoursSunday}
+                      {hoursLines.map((line, i) => (
+                        <span key={line}>
+                          {i > 0 && <br />}
+                          {line}
+                        </span>
+                      ))}
                     </p>
                   </div>
                 </div>

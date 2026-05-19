@@ -1,6 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { isStaticShimMode } from "@/lib/api-config";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { DEFAULT_HOURS_LINE } from "@/data/site-hours";
 import { apiFetch } from "@/lib/api-fetch";
+import { useApiQueryWithStaticFallback } from "@/lib/use-api-query";
 
 export type SiteSettings = {
   hours_weekday: string;
@@ -14,10 +15,10 @@ export type SiteSettings = {
 
 const SETTINGS_KEY = ["settings"] as const;
 
-const STATIC_SETTINGS: SiteSettings = {
-  hours_weekday: "Mon–Thu: 11am – 9pm",
-  hours_weekend: "Fri–Sat: 11am – 10pm",
-  hours_sunday: "Sun: 10am – 8pm",
+export const STATIC_SETTINGS: SiteSettings = {
+  hours_weekday: DEFAULT_HOURS_LINE,
+  hours_weekend: "",
+  hours_sunday: "",
   announcement_active: "true",
   announcement_title: "Now Making Homemade Jerky!",
   announcement_body:
@@ -31,12 +32,10 @@ async function fetchSettings(): Promise<SiteSettings> {
 }
 
 export function useSettings() {
-  return useQuery<SiteSettings>({
-    queryKey: [...SETTINGS_KEY],
-    queryFn: () =>
-      isStaticShimMode() ? Promise.resolve(STATIC_SETTINGS) : fetchSettings(),
-    initialData: isStaticShimMode() ? STATIC_SETTINGS : undefined,
-    staleTime: isStaticShimMode() ? Infinity : 30_000,
+  return useApiQueryWithStaticFallback({
+    queryKey: SETTINGS_KEY,
+    staticData: STATIC_SETTINGS,
+    fetchFn: fetchSettings,
   });
 }
 

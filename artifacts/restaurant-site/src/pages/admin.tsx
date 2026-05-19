@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   useListSpecials, useCreateSpecial, useUpdateSpecial, useDeleteSpecial, getListSpecialsQueryKey,
@@ -18,7 +18,8 @@ import { Plus, Edit2, Trash2, Link as LinkIcon, ImagePlus, X, Loader2, Image, Se
 import { QRCodeCanvas } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
 import { ensureArray } from "@/lib/utils";
-import { useUpload } from "@workspace/object-storage-web";
+import { uploadGalleryImage } from "@/lib/upload-gallery-image";
+import { DEFAULT_HOURS_LINE } from "@/data/site-hours";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
 import {
   useMenu, useCreateCategory, useUpdateCategory, useDeleteCategory,
@@ -608,10 +609,26 @@ function GalleryTab({ toast }: { toast: any }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingCaption, setPendingCaption] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
-  const { uploadFile, isUploading } = useUpload({
-    onSuccess: async (response) => {
-      const imageUrl = `/api/storage${response.objectPath}`;
+  useEffect(() => {
+    return () => {
+      if (previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    setIsUploading(true);
+
+    try {
+      const imageUrl = await uploadGalleryImage(file);
       createPhoto.mutate(
         { data: { imageUrl, caption: pendingCaption || null, sortOrder: 0 } },
         {
@@ -623,17 +640,13 @@ function GalleryTab({ toast }: { toast: any }) {
             if (fileInputRef.current) fileInputRef.current.value = "";
           },
           onError: () => toast({ title: "Failed to save photo", variant: "destructive" }),
-        }
+        },
       );
-    },
-    onError: () => toast({ title: "Upload failed", variant: "destructive" }),
-  });
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPreviewUrl(URL.createObjectURL(file));
-    await uploadFile(file);
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -676,10 +689,10 @@ function GalleryTab({ toast }: { toast: any }) {
               )}
             </button>
           </div>
-          {previewUrl && (
-            <div className="shrink-0 w-40 h-40 rounded-lg overflow-hidden border-2 border-border">
-              <img src={previewUrl} alt="preview" className="w-full h-full object-cover" />
-            </div>
+          {previewUrl.startsWith("blob:") && (
+            <motion.div className="shrink-0 w-40 h-40 rounded-lg overflow-hidden border-2 border-border">
+              <img src={previewUrl} alt="" role="presentation" className="w-full h-full object-cover" />
+            </motion.div>
           )}
         </div>
       </div>
@@ -729,17 +742,17 @@ function SiteInfoTab({ toast }: { toast: any }) {
   const { data: settings, isLoading } = useSettings();
   const updateSettings = useUpdateSettings();
 
-  const [hours, setHours] = useState({ weekday: "", weekend: "", sunday: "" });
+  const [hoursLine, setHoursLine] = useState("");
   const [announcement, setAnnouncement] = useState({ active: true, title: "", body: "" });
   const [story, setStory] = useState("");
   const [initialized, setInitialized] = useState(false);
 
   if (settings && !initialized) {
-    setHours({
-      weekday: settings.hours_weekday ?? "",
-      weekend: settings.hours_weekend ?? "",
-      sunday: settings.hours_sunday ?? "",
-    });
+    const combined =
+      settings.hours_weekday?.trim() ||
+      [settings.hours_weekend, settings.hours_sunday].filter(Boolean).join(" ") ||
+      DEFAULT_HOURS_LINE;
+    setHoursLine(combined);
     setAnnouncement({
       active: settings.announcement_active !== "false",
       title: settings.announcement_title ?? "",
@@ -751,9 +764,9 @@ function SiteInfoTab({ toast }: { toast: any }) {
 
   const saveHours = () => {
     updateSettings.mutate({
-      hours_weekday: hours.weekday,
-      hours_weekend: hours.weekend,
-      hours_sunday: hours.sunday,
+      hours_weekday: hoursLine.trim(),
+      hours_weekend: "",
+      hours_sunday: "",
     }, { onSuccess: () => toast({ title: "Hours saved!" }) });
   };
 
@@ -782,16 +795,12 @@ function SiteInfoTab({ toast }: { toast: any }) {
         <p className="text-muted-foreground text-sm mb-6">Shown on the home page and in the footer.</p>
         <div className="flex flex-col gap-4">
           <div>
-            <Label className="mb-1.5 block">Monday – Thursday</Label>
-            <Input value={hours.weekday} onChange={e => setHours(h => ({ ...h, weekday: e.target.value }))} placeholder="Mon–Thu: 11am – 9pm" />
-          </div>
-          <div>
-            <Label className="mb-1.5 block">Friday – Saturday</Label>
-            <Input value={hours.weekend} onChange={e => setHours(h => ({ ...h, weekend: e.target.value }))} placeholder="Fri–Sat: 11am – 10pm" />
-          </div>
-          <div>
-            <Label className="mb-1.5 block">Sunday</Label>
-            <Input value={hours.sunday} onChange={e => setHours(h => ({ ...h, sunday: e.target.value }))} placeholder="Sun: 10am – 8pm" />
+            <Label className="mb-1.5 block">Business hours</Label>
+            <Input
+              value={hoursLine}
+              onChange={e => setHoursLine(e.target.value)}
+              placeholder={DEFAULT_HOURS_LINE}
+            />
           </div>
           <Button onClick={saveHours} disabled={updateSettings.isPending} className="mt-2 w-fit" style={{ background: "var(--piggy-pink)" }}>
             Save Hours
