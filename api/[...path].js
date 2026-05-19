@@ -1,4 +1,4 @@
-import app from "../artifacts/api-server/dist/vercel.mjs";
+import app from "./index.mjs";
 
 export default function handler(req, res) {
   req.url = req.url?.replace(/^\/api(?:\/|$)/, "/") ?? "/";
