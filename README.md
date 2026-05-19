@@ -15,7 +15,7 @@ Keep these project settings:
 
 Required environment variables:
 
-- `DATABASE_URL`: Postgres connection string used by menu/settings/gallery/specials.
+- `DATABASE_URL`, `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, or `POSTGRES_URL_NON_POOLING`: Postgres connection string used by menu/settings/gallery/specials. Vercel Postgres/Neon often sets one of these; the API accepts any of them.
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`: needed for gallery image uploads.
 
 Before or after the first deploy, create/update the database tables:
@@ -23,6 +23,9 @@ Before or after the first deploy, create/update the database tables:
 ```sh
 DATABASE_URL="postgres://..." pnpm --filter @workspace/db run push
 ```
+
+If your Vercel database integration gives you `POSTGRES_URL` instead, use that
+environment variable for the same command.
 
 Then redeploy Vercel. After deploy, verify these URLs return JSON, not the HTML
 app shell:

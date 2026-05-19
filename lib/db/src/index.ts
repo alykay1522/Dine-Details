@@ -4,13 +4,25 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
+const connectionString =
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_URL ??
+  process.env.POSTGRES_PRISMA_URL ??
+  process.env.POSTGRES_URL_NON_POOLING;
+
+if (!connectionString) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
+    "DATABASE_URL, POSTGRES_URL, POSTGRES_PRISMA_URL, or POSTGRES_URL_NON_POOLING must be set. Did you forget to provision a database?",
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const ssl =
+  connectionString.includes("localhost") ||
+  connectionString.includes("127.0.0.1")
+    ? undefined
+    : { rejectUnauthorized: false };
+
+export const pool = new Pool({ connectionString, ssl });
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";
