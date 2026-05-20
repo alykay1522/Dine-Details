@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import multer from "multer";
+import { isDevUploadMode, saveDevUpload } from "../lib/dev-uploads";
 
 const router: IRouter = Router();
 const upload = multer({
@@ -29,18 +30,29 @@ async function getConfiguredCloudinary() {
 
 /** Multipart image upload for admin gallery (Vercel / Cloudinary). */
 router.post("/upload-image", upload.single("file"), async (req, res): Promise<void> => {
-  const cloudinary = await getConfiguredCloudinary();
-  if (!cloudinary) {
-    res.status(503).json({
-      error:
-        "Image upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
-    });
-    return;
-  }
-
   const file = req.file;
   if (!file) {
     res.status(400).json({ error: "No file provided. Use field name 'file'." });
+    return;
+  }
+
+  const cloudinary = await getConfiguredCloudinary();
+  if (!cloudinary) {
+    if (isDevUploadMode()) {
+      try {
+        const url = await saveDevUpload(file.buffer, file.originalname);
+        res.json({ url });
+        return;
+      } catch (error) {
+        console.error("Dev upload save failed", error);
+        res.status(500).json({ error: "Upload failed" });
+        return;
+      }
+    }
+    res.status(503).json({
+      error:
+        "Image upload is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in Vercel.",
+    });
     return;
   }
 

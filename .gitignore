@@ -2,8 +2,9 @@
 
 # compiled output
 dist
-api/index.mjs
-api/index.mjs.map
+artifacts/api-server/uploads
+api/handler.mjs
+api/handler.mjs.map
 tmp
 out-tsc
 *.tsbuildinfo

@@ -120,7 +120,7 @@ async function buildAll() {
     ...esbuildOptions,
     entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
     outdir: repoApiDir,
-    entryNames: "index",
+    entryNames: "handler",
     outExtension: { ".js": ".mjs" },
     plugins: [],
   });

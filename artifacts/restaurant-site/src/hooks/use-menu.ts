@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { STATIC_MENU } from "../data/static-menu";
 import { apiFetch } from "@/lib/api-fetch";
 import { useApiQueryWithStaticFallback } from "@/lib/use-api-query";
@@ -34,6 +34,15 @@ export function useMenu() {
     queryKey: MENU_KEY,
     staticData: STATIC_MENU,
     fetchFn: fetchMenu,
+  });
+}
+
+/** Admin editor — always hits the API (no static fallback). */
+export function useMenuAdmin() {
+  return useQuery({
+    queryKey: [...MENU_KEY, "admin"] as const,
+    queryFn: fetchMenu,
+    retry: 1,
   });
 }
 
