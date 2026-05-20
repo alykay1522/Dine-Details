@@ -1,17 +1,17 @@
 {
-    "installCommand": "pnpm install --no-frozen-lockfile",
-    "buildCommand": "pnpm --filter @workspace/db push && pnpm -C artifacts/api-server build && node scripts/verify-vercel-build.mjs && pnpm -C artifacts/restaurant-site build",
-    "outputDirectory": "artifacts/restaurant-site/dist/public",
-    "functions": {
-          "api/[...path].js": {
-                  "maxDuration": 60,
-                  "memory": 1024
-          }
-    },
-    "rewrites": [
-          {
-                  "source": "/:path((?!api/).*)",
-                  "destination": "/index.html"
-          }
-    ]
+      "installCommand": "pnpm install --no-frozen-lockfile",
+      "buildCommand": "pnpm --filter @workspace/db push-force && pnpm -C artifacts/api-server build && node scripts/verify-vercel-build.mjs && pnpm -C artifacts/restaurant-site build",
+      "outputDirectory": "artifacts/restaurant-site/dist/public",
+      "functions": {
+              "api/[...path].js": {
+                        "maxDuration": 60,
+                        "memory": 1024
+              }
+      },
+      "rewrites": [
+              {
+                        "source": "/:path((?!api/).*)",
+                        "destination": "/index.html"
+              }
+      ]
 }
