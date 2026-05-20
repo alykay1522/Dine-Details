@@ -1,0 +1,87 @@
+name: Install Dependencies Cache
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - cursor/setup-deps-08e8
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cursor/setup-deps-08e8
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Package pnpm store and node_modules
+        run: |
+          STORE_PATH=$(pnpm store path)
+          echo "Store path: $STORE_PATH"
+          
+          # Create a tar of the pnpm store
+          tar czf /tmp/pnpm-store.tar.gz -C "$(dirname $STORE_PATH)" "$(basename $STORE_PATH)"
+          ls -lh /tmp/pnpm-store.tar.gz
+          
+          # Create tar of all node_modules directories
+          find . -name node_modules -not -path '*/node_modules/*/node_modules' | sort > /tmp/nm-dirs.txt
+          cat /tmp/nm-dirs.txt
+          tar czf /tmp/node-modules.tar.gz -T /tmp/nm-dirs.txt
+          ls -lh /tmp/node-modules.tar.gz
+          
+          # Also save the lockfile
+          cp pnpm-lock.yaml /tmp/pnpm-lock.yaml
+
+      - name: Upload pnpm store
+        uses: actions/upload-artifact@v4
+        with:
+          name: pnpm-store
+          path: /tmp/pnpm-store.tar.gz
+          retention-days: 1
+
+      - name: Upload node modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-modules
+          path: /tmp/node-modules.tar.gz
+          retention-days: 1
+
+      - name: Upload lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: lockfile
+          path: /tmp/pnpm-lock.yaml
+          retention-days: 1
+
+      - name: Commit node_modules to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Split archives into chunks for git
+          mkdir -p .deps-cache
+          
+          # Split pnpm-store.tar.gz into 50MB chunks
+          split -b 50M /tmp/pnpm-store.tar.gz .deps-cache/pnpm-store.tar.gz.part-
+          
+          # Split node-modules.tar.gz into 50MB chunks
+          split -b 50M /tmp/node-modules.tar.gz .deps-cache/node-modules.tar.gz.part-
+          
+          # Copy lockfile
+          cp /tmp/pnpm-lock.yaml .deps-cache/
+          
+          ls -lh .deps-cache/
+          
+          git add .deps-cache/
+          git commit -m "chore: cache dependencies for cloud agent setup"
+          git push origin cursor/setup-deps-08e8 --force
