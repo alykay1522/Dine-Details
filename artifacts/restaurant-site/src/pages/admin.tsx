@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import {
   useListSpecials, useCreateSpecial, useUpdateSpecial, useDeleteSpecial, getListSpecialsQueryKey,
   useListGallery, useCreateGalleryPhoto, useDeleteGalleryPhoto, getListGalleryQueryKey,
-  ApiError,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -19,10 +18,12 @@ import { QRCodeCanvas } from "qrcode.react";
 import { useToast } from "@/hooks/use-toast";
 import { ensureArray } from "@/lib/utils";
 import { uploadGalleryImage } from "@/lib/upload-gallery-image";
+import { formatApiError } from "@/lib/format-api-error";
+import { AdminApiStatus } from "@/components/admin-api-status";
 import { DEFAULT_HOURS_LINE } from "@/data/site-hours";
 import { useSettings, useUpdateSettings } from "@/hooks/use-settings";
 import {
-  useMenu, useCreateCategory, useUpdateCategory, useDeleteCategory,
+  useMenuAdmin, useCreateCategory, useUpdateCategory, useDeleteCategory,
   useCreateMenuItem, useUpdateMenuItem, useDeleteMenuItem,
   type MenuCategoryData, type MenuItemData,
 } from "@/hooks/use-menu";
@@ -117,6 +118,8 @@ export default function Admin() {
           </Button>
         </div>
 
+        <AdminApiStatus />
+
         {/* Tabs */}
         <div className="flex gap-0 mb-8 border-b border-border overflow-x-auto">
           {([
@@ -158,7 +161,7 @@ const COLOR_OPTIONS = [
 ];
 
 function MenuTab({ toast }: { toast: any }) {
-  const { data: menuRaw, isLoading } = useMenu();
+  const { data: menuRaw, isLoading, isError: menuError } = useMenuAdmin();
   const menu = ensureArray<MenuCategoryData>(menuRaw);
   const createCat = useCreateCategory();
   const updateCat = useUpdateCategory();
@@ -177,15 +180,19 @@ function MenuTab({ toast }: { toast: any }) {
   const openEditCat = (cat: MenuCategoryData) => { setCatForm({ name: cat.name, subtitle: cat.subtitle ?? "", icon: cat.icon ?? "", color: cat.color }); setCatDialog({ open: true, editing: cat }); };
   const saveCat = async () => {
     if (!catForm.name.trim()) return;
-    if (catDialog.editing) {
-      await updateCat.mutateAsync({ id: catDialog.editing.id, ...catForm, sortOrder: catDialog.editing.sortOrder });
-      toast({ title: "Category updated!" });
-    } else {
-      const sortOrder = menu.length;
-      await createCat.mutateAsync({ ...catForm, sortOrder });
-      toast({ title: "Category added!" });
+    try {
+      if (catDialog.editing) {
+        await updateCat.mutateAsync({ id: catDialog.editing.id, ...catForm, sortOrder: catDialog.editing.sortOrder });
+        toast({ title: "Category updated!" });
+      } else {
+        const sortOrder = menu.length;
+        await createCat.mutateAsync({ ...catForm, sortOrder });
+        toast({ title: "Category added!" });
+      }
+      setCatDialog({ open: false, editing: null });
+    } catch (err) {
+      toast({ title: "Could not save category", description: formatApiError(err), variant: "destructive" });
     }
-    setCatDialog({ open: false, editing: null });
   };
 
   const [itemDialog, setItemDialog] = useState<{ open: boolean; categoryId: number; editing: MenuItemData | null }>({ open: false, categoryId: 0, editing: null });
@@ -195,15 +202,19 @@ function MenuTab({ toast }: { toast: any }) {
   const openEditItem = (item: MenuItemData) => { setItemForm({ name: item.name, price: item.price ?? "", note: item.note ?? "" }); setItemDialog({ open: true, categoryId: item.categoryId, editing: item }); };
   const saveItem = async () => {
     if (!itemForm.name.trim()) return;
-    if (itemDialog.editing) {
-      await updateItem.mutateAsync({ id: itemDialog.editing.id, ...itemForm });
-      toast({ title: "Item updated!" });
-    } else {
-      const cat = menu.find(c => c.id === itemDialog.categoryId);
-      await createItem.mutateAsync({ categoryId: itemDialog.categoryId, ...itemForm, sortOrder: ensureArray(cat?.items).length });
-      toast({ title: "Item added!" });
+    try {
+      if (itemDialog.editing) {
+        await updateItem.mutateAsync({ id: itemDialog.editing.id, ...itemForm });
+        toast({ title: "Item updated!" });
+      } else {
+        const cat = menu.find(c => c.id === itemDialog.categoryId);
+        await createItem.mutateAsync({ categoryId: itemDialog.categoryId, ...itemForm, sortOrder: ensureArray(cat?.items).length });
+        toast({ title: "Item added!" });
+      }
+      setItemDialog({ open: false, categoryId: 0, editing: null });
+    } catch (err) {
+      toast({ title: "Could not save item", description: formatApiError(err), variant: "destructive" });
     }
-    setItemDialog({ open: false, categoryId: 0, editing: null });
   };
 
   return (
@@ -217,6 +228,12 @@ function MenuTab({ toast }: { toast: any }) {
           <Plus size={16} /> Add Category
         </Button>
       </div>
+
+      {menuError && (
+        <p className="text-sm text-destructive mb-4">
+          Could not load menu from the API. Start the API server or check DATABASE_URL on Vercel.
+        </p>
+      )}
 
       {isLoading && <div className="flex justify-center py-12"><Loader2 size={32} className="animate-spin text-primary" /></div>}
 
@@ -357,14 +374,7 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
   const deleteSpecial = useDeleteSpecial();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadFile, isUploading } = useUpload({
-    onSuccess: (response) => {
-      const imageUrl = `/api/storage${response.objectPath}`;
-      setFormData(prev => ({ ...prev, imageUrl }));
-      toast({ title: "Image uploaded!" });
-    },
-    onError: () => toast({ title: "Image upload failed", variant: "destructive" }),
-  });
+  const [isUploading, setIsUploading] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSpecial, setEditingSpecial] = useState<any>(null);
@@ -403,18 +413,16 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
     };
     if (editingSpecial) {
       updateSpecial.mutate({ id: editingSpecial.id, data: payload }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special updated!" }); setIsDialogOpen(false); resetForm(); },
         onError: (err) => {
-          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
-          toast({ title: "Could not update special", description, variant: "destructive" });
+          toast({ title: "Could not update special", description: formatApiError(err), variant: "destructive" });
         },
       });
     } else {
       createSpecial.mutate({ data: payload }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special created!" }); setIsDialogOpen(false); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special created!" }); setIsDialogOpen(false); resetForm(); },
         onError: (err) => {
-          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
-          toast({ title: "Could not create special", description, variant: "destructive" });
+          toast({ title: "Could not create special", description: formatApiError(err), variant: "destructive" });
         },
       });
     }
@@ -424,8 +432,7 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
     updateSpecial.mutate({ id: special.id, data: { isActive: !special.isActive } }, {
       onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: `Special marked ${!special.isActive ? "active" : "inactive"}` }); },
       onError: (err) => {
-        const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
-        toast({ title: "Could not update special", description, variant: "destructive" });
+        toast({ title: "Could not update special", description: formatApiError(err), variant: "destructive" });
       },
     });
   };
@@ -435,8 +442,7 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
       deleteSpecial.mutate({ id }, {
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special deleted" }); },
         onError: (err) => {
-          const description = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Request failed";
-          toast({ title: "Could not delete special", description, variant: "destructive" });
+          toast({ title: "Could not delete special", description: formatApiError(err), variant: "destructive" });
         },
       });
     }
@@ -495,7 +501,30 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
                   </div>
                   <div className="flex flex-col gap-2">
                     <Label>Photo (optional)</Label>
-                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await uploadFile(f); }} />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        setIsUploading(true);
+                        try {
+                          const imageUrl = await uploadGalleryImage(f);
+                          setFormData(prev => ({ ...prev, imageUrl }));
+                          toast({ title: "Image uploaded!" });
+                        } catch (err) {
+                          toast({
+                            title: "Image upload failed",
+                            description: formatApiError(err),
+                            variant: "destructive",
+                          });
+                        } finally {
+                          setIsUploading(false);
+                        }
+                      }}
+                    />
                     {formData.imageUrl ? (
                       <div className="relative rounded-lg overflow-hidden border border-border">
                         <img src={formData.imageUrl} alt="preview" className="w-full h-40 object-cover" />
@@ -639,11 +668,11 @@ function GalleryTab({ toast }: { toast: any }) {
             setPreviewUrl("");
             if (fileInputRef.current) fileInputRef.current.value = "";
           },
-          onError: () => toast({ title: "Failed to save photo", variant: "destructive" }),
+          onError: (err) => toast({ title: "Failed to save photo", description: formatApiError(err), variant: "destructive" }),
         },
       );
-    } catch {
-      toast({ title: "Upload failed", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Upload failed", description: formatApiError(err), variant: "destructive" });
     } finally {
       setIsUploading(false);
     }
@@ -745,9 +774,9 @@ function SiteInfoTab({ toast }: { toast: any }) {
   const [hoursLine, setHoursLine] = useState("");
   const [announcement, setAnnouncement] = useState({ active: true, title: "", body: "" });
   const [story, setStory] = useState("");
-  const [initialized, setInitialized] = useState(false);
 
-  if (settings && !initialized) {
+  useEffect(() => {
+    if (!settings) return;
     const combined =
       settings.hours_weekday?.trim() ||
       [settings.hours_weekend, settings.hours_sunday].filter(Boolean).join(" ") ||
@@ -759,27 +788,47 @@ function SiteInfoTab({ toast }: { toast: any }) {
       body: settings.announcement_body ?? "",
     });
     setStory(settings.story_text ?? "");
-    setInitialized(true);
-  }
+  }, [settings]);
 
   const saveHours = () => {
-    updateSettings.mutate({
-      hours_weekday: hoursLine.trim(),
-      hours_weekend: "",
-      hours_sunday: "",
-    }, { onSuccess: () => toast({ title: "Hours saved!" }) });
+    updateSettings.mutate(
+      {
+        hours_weekday: hoursLine.trim(),
+        hours_weekend: "",
+        hours_sunday: "",
+      },
+      {
+        onSuccess: () => toast({ title: "Hours saved!" }),
+        onError: (err) =>
+          toast({ title: "Could not save hours", description: formatApiError(err), variant: "destructive" }),
+      },
+    );
   };
 
   const saveAnnouncement = () => {
-    updateSettings.mutate({
-      announcement_active: announcement.active ? "true" : "false",
-      announcement_title: announcement.title,
-      announcement_body: announcement.body,
-    }, { onSuccess: () => toast({ title: "Announcement saved!" }) });
+    updateSettings.mutate(
+      {
+        announcement_active: announcement.active ? "true" : "false",
+        announcement_title: announcement.title,
+        announcement_body: announcement.body,
+      },
+      {
+        onSuccess: () => toast({ title: "Announcement saved!" }),
+        onError: (err) =>
+          toast({ title: "Could not save announcement", description: formatApiError(err), variant: "destructive" }),
+      },
+    );
   };
 
   const saveStory = () => {
-    updateSettings.mutate({ story_text: story }, { onSuccess: () => toast({ title: "Story saved!" }) });
+    updateSettings.mutate(
+      { story_text: story },
+      {
+        onSuccess: () => toast({ title: "Story saved!" }),
+        onError: (err) =>
+          toast({ title: "Could not save story", description: formatApiError(err), variant: "destructive" }),
+      },
+    );
   };
 
   if (isLoading) {

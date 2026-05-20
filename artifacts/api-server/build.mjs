@@ -45,8 +45,6 @@ const external = [
   "@aws-sdk/*",
   "@azure/*",
   "@opentelemetry/*",
-  "@google-cloud/*",
-  "@google/*",
   "googleapis",
   "firebase-admin",
   "@parcel/watcher",
@@ -121,8 +119,10 @@ async function buildAll() {
   await esbuild({
     ...esbuildOptions,
     entryPoints: [path.resolve(artifactDir, "src/vercel.ts")],
-    outfile: path.resolve(repoApiDir, "index.mjs"),
+    outdir: repoApiDir,
+    entryNames: "handler",
     outExtension: { ".js": ".mjs" },
+    plugins: [],
   });
 }
 

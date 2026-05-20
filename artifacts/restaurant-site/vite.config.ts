@@ -29,6 +29,12 @@ const basePath = normalizeViteBase(process.env.BASE_PATH);
 const useApiShims = process.env.VITE_USE_API_SHIMS === "true";
 
 const apiOrigin = process.env.VITE_API_ORIGIN?.replace(/\/+$/, "") ?? "";
+/** In dev, proxy /api to Express when VITE_API_ORIGIN is unset (same-origin as production). */
+const devApiProxyTarget =
+  apiOrigin ||
+  (process.env.NODE_ENV !== "production"
+    ? (process.env.VITE_DEV_API_PROXY ?? "http://127.0.0.1:3001")
+    : "");
 
 export default defineConfig({
   base: basePath,
@@ -79,10 +85,10 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
     allowedHosts: true,
-    ...(apiOrigin
+    ...(devApiProxyTarget
       ? {
           proxy: {
-            "/api": { target: apiOrigin, changeOrigin: true },
+            "/api": { target: devApiProxyTarget, changeOrigin: true },
           },
         }
       : {}),
