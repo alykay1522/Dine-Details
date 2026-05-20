@@ -21,13 +21,12 @@ jobs:
       - name: Install and package PostgreSQL
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql postgresql-client
+          sudo apt-get install -y postgresql postgresql-client libpq5
           
-          # Package all PostgreSQL files
           pg_version=$(ls /usr/lib/postgresql/)
           echo "PostgreSQL version: $pg_version"
           
-          # Create tarball of PostgreSQL installation
+          # Package PostgreSQL binaries AND libpq
           tar czf /tmp/postgresql.tar.gz \
             /usr/lib/postgresql/ \
             /usr/share/postgresql/ \
@@ -37,36 +36,27 @@ jobs:
             /usr/bin/dropdb \
             /usr/bin/createuser \
             /usr/bin/dropuser \
-            /usr/bin/initdb 2>/dev/null || true
+            /usr/bin/initdb \
+            $(find /usr/lib/x86_64-linux-gnu -name "libpq*" 2>/dev/null) \
+            2>/dev/null || true
           
-          # Get required shared libraries
-          for bin in /usr/lib/postgresql/$pg_version/bin/postgres /usr/bin/psql; do
-            ldd "$bin" 2>/dev/null | grep "=> /" | awk '{print $3}'
-          done | sort -u > /tmp/pg-libs.txt
-          
-          # Only include non-standard libs (not libc, libm, etc.)
-          grep -v -E '(libc\.|libm\.|libdl\.|libpthread\.|librt\.|ld-linux)' /tmp/pg-libs.txt > /tmp/pg-extra-libs.txt || true
-          cat /tmp/pg-extra-libs.txt
-          
-          tar czf /tmp/pg-libs.tar.gz -T /tmp/pg-extra-libs.txt 2>/dev/null || true
-          
-          ls -lh /tmp/postgresql.tar.gz /tmp/pg-libs.tar.gz
+          ls -lh /tmp/postgresql.tar.gz
 
       - name: Push to deps-cache branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git fetch origin deps-cache || true
-          git checkout deps-cache || git checkout --orphan deps-cache
-          git pull origin deps-cache --rebase 2>/dev/null || true
+          git fetch origin deps-cache
+          git checkout deps-cache
           
-          # Add PostgreSQL files
-          cp /tmp/postgresql.tar.gz deps/ 2>/dev/null || mkdir -p deps && cp /tmp/postgresql.tar.gz deps/
-          cp /tmp/pg-libs.tar.gz deps/ 2>/dev/null || true
+          cp /tmp/postgresql.tar.gz deps/
+          
+          # Remove old pg-libs since we've merged it into postgresql.tar.gz
+          rm -f deps/pg-libs.tar.gz
           
           ls -lh deps/
           
           git add deps/
-          git commit -m "deps: add PostgreSQL binaries for cloud agent" || echo "No changes"
+          git commit -m "deps: update PostgreSQL package with libpq" || echo "No changes"
           git push origin deps-cache --force
