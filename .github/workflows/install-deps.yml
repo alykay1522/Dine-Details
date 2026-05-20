@@ -8,10 +8,13 @@ on:
 jobs:
   install:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: cursor/setup-deps-08e8
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -24,64 +27,35 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Package pnpm store and node_modules
+      - name: Package dependencies
         run: |
-          STORE_PATH=$(pnpm store path)
-          echo "Store path: $STORE_PATH"
-          
-          # Create a tar of the pnpm store
-          tar czf /tmp/pnpm-store.tar.gz -C "$(dirname $STORE_PATH)" "$(basename $STORE_PATH)"
-          ls -lh /tmp/pnpm-store.tar.gz
-          
-          # Create tar of all node_modules directories
-          find . -name node_modules -not -path '*/node_modules/*/node_modules' | sort > /tmp/nm-dirs.txt
-          cat /tmp/nm-dirs.txt
-          tar czf /tmp/node-modules.tar.gz -T /tmp/nm-dirs.txt
+          # Create tar of node_modules (with max compression)
+          tar cf - $(find . -maxdepth 3 -name node_modules -not -path '*/node_modules/*/node_modules' | sort) | gzip -9 > /tmp/node-modules.tar.gz
           ls -lh /tmp/node-modules.tar.gz
           
-          # Also save the lockfile
+          # Copy lockfile
           cp pnpm-lock.yaml /tmp/pnpm-lock.yaml
 
-      - name: Upload pnpm store
-        uses: actions/upload-artifact@v4
-        with:
-          name: pnpm-store
-          path: /tmp/pnpm-store.tar.gz
-          retention-days: 1
-
-      - name: Upload node modules
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-modules
-          path: /tmp/node-modules.tar.gz
-          retention-days: 1
-
-      - name: Upload lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: lockfile
-          path: /tmp/pnpm-lock.yaml
-          retention-days: 1
-
-      - name: Commit node_modules to branch
+      - name: Push dependencies to orphan branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Split archives into chunks for git
-          mkdir -p .deps-cache
+          # Create a fresh orphan branch for deps
+          git checkout --orphan deps-cache
+          git rm -rf . 2>/dev/null || true
           
-          # Split pnpm-store.tar.gz into 50MB chunks
-          split -b 50M /tmp/pnpm-store.tar.gz .deps-cache/pnpm-store.tar.gz.part-
+          # Split into 90MB chunks (under GitHub 100MB limit)
+          mkdir -p deps
+          split -b 90M /tmp/node-modules.tar.gz deps/nm.tar.gz.part-
+          cp /tmp/pnpm-lock.yaml deps/
           
-          # Split node-modules.tar.gz into 50MB chunks
-          split -b 50M /tmp/node-modules.tar.gz .deps-cache/node-modules.tar.gz.part-
+          # Create manifest
+          ls -lh deps/ > deps/MANIFEST.txt
+          echo "Total parts: $(ls deps/nm.tar.gz.part-* | wc -l)" >> deps/MANIFEST.txt
           
-          # Copy lockfile
-          cp /tmp/pnpm-lock.yaml .deps-cache/
+          cat deps/MANIFEST.txt
           
-          ls -lh .deps-cache/
-          
-          git add .deps-cache/
-          git commit -m "chore: cache dependencies for cloud agent setup"
-          git push origin cursor/setup-deps-08e8 --force
+          git add deps/
+          git commit -m "deps: cached node_modules for cloud agent"
+          git push origin deps-cache --force
