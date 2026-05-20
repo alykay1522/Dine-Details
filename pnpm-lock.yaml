@@ -5695,13 +5695,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.3':
     optional: true
-  '@esbuild/win32-arm64@0.27.3':
-    optional: true
-
-  '@esbuild/win32-ia32@0.27.3':
-    optional: true
-
-  '@esbuild/win32-x64@0.27.3': {}
 
   '@floating-ui/core@1.7.5':
     dependencies:
