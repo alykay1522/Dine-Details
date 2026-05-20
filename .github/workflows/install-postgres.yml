@@ -42,21 +42,18 @@ jobs:
           
           ls -lh /tmp/postgresql.tar.gz
 
-      - name: Push to deps-cache branch
+      - name: Push to pg-cache branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git fetch origin deps-cache
-          git checkout deps-cache
+          git checkout --orphan pg-cache
+          git rm -rf . 2>/dev/null || true
           
-          cp /tmp/postgresql.tar.gz deps/
+          mkdir -p pg
+          cp /tmp/postgresql.tar.gz pg/
+          ls -lh pg/
           
-          # Remove old pg-libs since we've merged it into postgresql.tar.gz
-          rm -f deps/pg-libs.tar.gz
-          
-          ls -lh deps/
-          
-          git add deps/
-          git commit -m "deps: update PostgreSQL package with libpq" || echo "No changes"
-          git push origin deps-cache --force
+          git add pg/
+          git commit -m "deps: PostgreSQL 16 binaries with libpq for cloud agent"
+          git push origin pg-cache --force
