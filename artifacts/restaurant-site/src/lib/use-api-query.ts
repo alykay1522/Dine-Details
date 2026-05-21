@@ -16,7 +16,7 @@ export function useApiQueryWithStaticFallback<T>({
   fetchFn: () => Promise<T>;
   staleTime?: number;
 }) {
-  return useQuery<T>({
+  const options: UseQueryOptions<T> = {
     queryKey,
     queryFn: async () => {
       if (isStaticShimMode()) return staticData;
@@ -29,7 +29,8 @@ export function useApiQueryWithStaticFallback<T>({
         return staticData;
       }
     },
-    placeholderData: staticData,
+    placeholderData: staticData as never,
     staleTime: isStaticShimMode() ? Infinity : staleTime,
-  } satisfies UseQueryOptions<T>);
+  };
+  return useQuery<T>(options);
 }
