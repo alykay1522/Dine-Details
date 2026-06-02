@@ -1,23 +1,33 @@
 import { NextResponse } from "next/server";
-import { getSpecials, createSpecial } from "@/utils/specials";
+import { getSpecial, updateSpecial, deleteSpecial } from "@/utils/specials";
 
-export async function GET() {
+export async function GET(req, { params }) {
   try {
-    const specials = await getSpecials();
-    return NextResponse.json(specials);
+    const special = await getSpecial(params.id);
+    return NextResponse.json(special);
   } catch (err) {
-    console.error("GET /api/specials failed:", err);
-    return NextResponse.json({ error: "Failed to load specials" }, { status: 500 });
+    console.error("GET /api/specials/[id] failed:", err);
+    return NextResponse.json({ error: "Failed to load special" }, { status: 500 });
   }
 }
 
-export async function POST(req) {
+export async function PUT(req, { params }) {
   try {
     const data = await req.json();
-    const created = await createSpecial(data);
-    return NextResponse.json(created, { status: 201 });
+    const updated = await updateSpecial(params.id, data);
+    return NextResponse.json(updated);
   } catch (err) {
-    console.error("POST /api/specials failed:", err);
-    return NextResponse.json({ error: "Failed to create special" }, { status: 500 });
+    console.error("PUT /api/specials/[id] failed:", err);
+    return NextResponse.json({ error: "Failed to update special" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req, { params }) {
+  try {
+    const deleted = await deleteSpecial(params.id);
+    return NextResponse.json({ success: true, deleted });
+  } catch (err) {
+    console.error("DELETE /api/specials/[id] failed:", err);
+    return NextResponse.json({ error: "Failed to delete special" }, { status: 500 });
   }
 }
