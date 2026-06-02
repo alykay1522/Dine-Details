@@ -6,6 +6,7 @@ import storageRouter from "./storage";
 import settingsRouter from "./settings";
 import menuRouter from "./menu";
 import uploadRouter from "./upload";
+import dataRouter from "./data";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(storageRouter);
 router.use(settingsRouter);
 router.use(menuRouter);
 router.use(uploadRouter);
+router.use(dataRouter);
 
 export default router;
