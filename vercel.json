@@ -1,5 +1,5 @@
 {
-      "installCommand": "pnpm install --no-frozen-lockfile",
+      "installCommand": "pnpm install --no-frozen-lockfile --config.allow-build=esbuild",
       "buildCommand": "pnpm --filter @workspace/db push-force && pnpm -C artifacts/api-server build && node scripts/verify-vercel-build.mjs && pnpm -C artifacts/restaurant-site build",
       "outputDirectory": "artifacts/restaurant-site/dist/public",
       "functions": {
