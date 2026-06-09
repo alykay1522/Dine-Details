@@ -3,7 +3,7 @@
   "buildCommand": "pnpm --filter @workspace/db push-force && pnpm -C artifacts/api-server build && pnpm -C artifacts/restaurant-site build",
   "outputDirectory": "artifacts/restaurant-site/dist/public",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/(.*)", "destination": "/api/handler" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
