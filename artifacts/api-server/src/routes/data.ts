@@ -6,7 +6,7 @@ const router: IRouter = Router();
 async function getCloudinary() {
     const cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
     const api_key = process.env.CLOUDINARY_API_KEY;
-    const api_secret = process.env.CLOUDINARY_SECRET;
+    const api_secret = process.env.CLOUDINARY_API_SECRET;  // Fixed: was CLOUDINARY_SECRET
     if (!cloud_name || !api_key || !api_secret) return null;
     const { v2: cloudinary } = await import("cloudinary");
     cloudinary.config({ cloud_name, api_key, api_secret });
@@ -54,7 +54,7 @@ router.post("/data/:type", async (req: Request, res: Response) => {
     try {
           const content = JSON.stringify(req.body);
           const buffer = Buffer.from(content, "utf-8");
-          await new Promise>void>((resolve, reject) => {
+          await new Promise<void>((resolve, reject) => {  // Fixed: was Promise>void>
                   const stream = cloudinary.uploader.upload_stream(
                     { public_id: `thislilpiggy/${type}.json`, resource_type: "raw", overwrite: true },
                             (err, result) => {
