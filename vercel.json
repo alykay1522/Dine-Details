@@ -3,13 +3,7 @@
   "buildCommand": "pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/restaurant-site run build",
   "outputDirectory": "artifacts/restaurant-site/dist/public",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/handler"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/(.*)", "destination": "/api/handler" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
