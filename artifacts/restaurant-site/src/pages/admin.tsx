@@ -438,14 +438,12 @@ function SpecialsTab({ menuUrl, toast }: { menuUrl: string; toast: any }) {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Delete this special?")) {
-      deleteSpecial.mutate({ id }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special deleted" }); },
-        onError: (err) => {
-          toast({ title: "Could not delete special", description: formatApiError(err), variant: "destructive" });
-        },
-      });
-    }
+    deleteSpecial.mutate({ id }, {
+      onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListSpecialsQueryKey() }); toast({ title: "Special deleted" }); },
+      onError: (err) => {
+        toast({ title: "Could not delete special", description: formatApiError(err), variant: "destructive" });
+      },
+    });
   };
 
   return (
@@ -679,12 +677,10 @@ function GalleryTab({ toast }: { toast: any }) {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("Remove this photo from the gallery?")) {
-      deletePhoto.mutate({ id }, {
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListGalleryQueryKey() }); toast({ title: "Photo removed" }); },
-        onError: () => toast({ title: "Failed to delete photo", variant: "destructive" }),
-      });
-    }
+    deletePhoto.mutate({ id }, {
+      onSuccess: () => { queryClient.invalidateQueries({ queryKey: getListGalleryQueryKey() }); toast({ title: "Photo removed" }); },
+      onError: () => toast({ title: "Failed to delete photo", variant: "destructive" }),
+    });
   };
 
   const busy = isUploading || createPhoto.isPending;
