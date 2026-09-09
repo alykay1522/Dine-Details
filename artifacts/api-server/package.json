@@ -20,7 +20,7 @@
     "drizzle-orm": "catalog:",
     "express": "^5",
     "google-auth-library": "^10.6.2",
-    "multer": "^2.2.0",
+    "multer": "^2.3.0",
     "pino": "^9",
     "pino-http": "^10"
   },
